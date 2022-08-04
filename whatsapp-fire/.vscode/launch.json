@@ -1,0 +1,14 @@
+{
+  "configurations": [
+    {
+      "name": "Start with debug",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": " yarn run dev",
+      "cwd": "${workspaceRoot}",
+      "internalConsoleOptions": "openOnSessionStart",
+      "envFile": "${workspaceFolder}/.env",
+      "skipFiles": ["<node_internals>/**", "node_modules/**"]
+    }
+  ]
+}
