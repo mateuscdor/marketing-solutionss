@@ -18,6 +18,7 @@ export type TableProps = {
   data: any[];
   onEditClick?: (index: number, item: any) => void;
   onDeleteClick?: (index: number, item: any) => void;
+  extraActionsComponent?: React.ReactNode;
 };
 const Table = ({ columns, data, onEditClick, onDeleteClick }: TableProps) => {
   return (
@@ -44,10 +45,7 @@ const Table = ({ columns, data, onEditClick, onDeleteClick }: TableProps) => {
             return (
               <tr key={item.id}>
                 {columns.map((column) => (
-                  <td
-                    key={`column-${item.id}-${column.key}`}
-                    className="hidden px-3 py-4 text-sm text-gray-500 lg:table-cell"
-                  >
+                  <td key={`column-${item.id}-${column.key}`}>
                     {item[column.key]}
                   </td>
                 ))}
