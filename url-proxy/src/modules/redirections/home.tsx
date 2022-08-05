@@ -99,6 +99,19 @@ const RedirectionsHome: NextPage = () => {
               });
             });
         }}
+        onShareClick={(index, item) => {
+          console.debug("Sharing entity", index);
+          const origin =
+            typeof window !== "undefined" && window.location.origin
+              ? window.location.origin
+              : "";
+          const sharedLink = `${origin}/go?origin=${item.id}`;
+
+          toast("Link copied to clipboard", {
+            type: "success",
+          });
+          navigator.clipboard.writeText(sharedLink);
+        }}
       />
       <RedirectionModal
         isOpen={pageState.modalIsOpen}

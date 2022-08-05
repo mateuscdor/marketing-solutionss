@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { redisClient } from "../../../services/redis";
-import { Redirect } from "../../../entities/Redirect";
+import { redisClient } from "../../../../services/redis";
+import { Redirect } from "../../../../entities/Redirect";
 
 export default async function userHandler(
   req: NextApiRequest,

@@ -18,9 +18,17 @@ export type TableProps = {
   data: any[];
   onEditClick?: (index: number, item: any) => void;
   onDeleteClick?: (index: number, item: any) => void;
+  onShareClick?: (index: number, item: any) => void;
+
   extraActionsComponent?: React.ReactNode;
 };
-const Table = ({ columns, data, onEditClick, onDeleteClick }: TableProps) => {
+const Table = ({
+  columns,
+  data,
+  onEditClick,
+  onDeleteClick,
+  onShareClick,
+}: TableProps) => {
   return (
     <div className="-mx-4 mt-8 overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:-mx-6 md:mx-0 md:rounded-lg">
       <table className="min-w-full divide-y divide-gray-300">
@@ -50,6 +58,15 @@ const Table = ({ columns, data, onEditClick, onDeleteClick }: TableProps) => {
                   </td>
                 ))}
                 <td className="py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 space-x-2">
+                  {onShareClick && (
+                    <button
+                      type="button"
+                      onClick={() => onShareClick(itemIndex, item)}
+                      className="text-indigo-600 hover:text-indigo-900"
+                    >
+                      Share
+                    </button>
+                  )}
                   {onEditClick && (
                     <button
                       type="button"

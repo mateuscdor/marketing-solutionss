@@ -21,7 +21,7 @@ export default async function handler(
       });
       break;
     case "POST":
-      const id = body.source;
+      const id = uuid();
       const entity = {
         ...body,
         id,

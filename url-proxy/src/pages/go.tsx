@@ -9,7 +9,9 @@ function GoPage() {
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { origin } = context.query;
 
-  const redirectStr = await redisClient.get(`redirect-${origin}`);
+  const id = `redirect-${origin}`;
+  console.debug("Getting", id);
+  const redirectStr = await redisClient.get(id);
 
   if (!redirectStr) {
     return {
@@ -22,12 +24,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     redirect.destinations[
       Math.floor(Math.random() * redirect.destinations.length)
     ];
-  console.log(context, {
-    resolvedUrl: context.resolvedUrl,
-    redirect,
-    destination,
-    url: destination.url,
-  });
+
   return {
     redirect: {
       destination: destination.url,
