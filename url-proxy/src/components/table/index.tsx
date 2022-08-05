@@ -48,16 +48,16 @@ const Table = ({
             </th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-200 bg-white">
+        <tbody className="divide-y divide-gray-200 bg-white px-4">
           {data.map((item, itemIndex) => {
             return (
               <tr key={item.id}>
                 {columns.map((column) => (
                   <td key={`column-${item.id}-${column.key}`}>
-                    {item[column.key]}
+                    <span>{item[column.key]}</span>
                   </td>
                 ))}
-                <td className="py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 space-x-2">
+                <td className="flex flex-col py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 justify-start items-start lg:space-x-2 lg:flex-row lg:justify-end">
                   {onShareClick && (
                     <button
                       type="button"

@@ -62,10 +62,6 @@ const RedirectionsHome: NextPage = () => {
             key: "source",
             label: "Source",
           },
-          {
-            key: "destinations",
-            label: "Destinations",
-          },
         ]}
         data={(entitiesResponse?.results || []).map((entity) => ({
           ...entity,
