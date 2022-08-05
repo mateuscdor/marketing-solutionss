@@ -1,4 +1,6 @@
 import { GetServerSideProps } from "next";
+import { DestinationModel } from "../db/mongoose/models/Destination";
+import { MongoId } from "../db/mongoose/utils";
 import { Redirect } from "../entities/Redirect";
 import { getKeyValuesByPattern, redisClient } from "../services/redis";
 
@@ -9,21 +11,33 @@ function GoPage() {
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { origin } = context.query;
 
-  const id = `redirect-${origin}`;
-  console.debug("Getting", id);
-  const redirectStr = await redisClient.get(id);
+  const filters = {
+    redirect: origin,
+    clicks: {
+      $lte: 1000,
+    },
+  };
 
-  if (!redirectStr) {
+  const destination = await DestinationModel.findOneAndUpdate(
+    filters,
+    {
+      $inc: { clicks: 1 },
+    },
+    {
+      sort: {
+        clicks: -1,
+      },
+      new: true,
+    }
+  ).lean();
+
+  console.log({ destination, origin });
+
+  if (!destination) {
     return {
       notFound: true,
     };
   }
-
-  const redirect = JSON.parse(redirectStr) as Redirect;
-  const destination =
-    redirect.destinations[
-      Math.floor(Math.random() * redirect.destinations.length)
-    ];
 
   return {
     redirect: {

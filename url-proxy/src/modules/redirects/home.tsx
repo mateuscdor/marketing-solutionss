@@ -6,18 +6,20 @@ import ManageHeader from "../../components/headers/manage";
 import Table from "../../components/table";
 import { Redirect } from "../../entities/Redirect";
 import DashboardLayout from "../../layouts/dashboard";
-import { RedirectionsService } from "../../services/redirections";
-import RedirectionModal from "./components/RedirectionModal";
+import { RedirectsService } from "../../services/redirects";
+import RedirectionModal from "./components/RedirectModal";
+import { useRouter } from "next/router";
 
-const service = new RedirectionsService();
+const service = new RedirectsService();
 
 export type PageState = {
   selectedEntity?: Redirect;
   modalIsOpen: boolean;
 };
-const RedirectionsHome: NextPage = () => {
+const RedirectsHome: NextPage = () => {
+  const router = useRouter();
   const { data: entitiesResponse, mutate } = useSWR(
-    "/api/redirections",
+    "/api/redirects",
     () => {
       return service.getMany();
     },
@@ -53,8 +55,8 @@ const RedirectionsHome: NextPage = () => {
             modalIsOpen: true,
           }));
         }}
-        title="Redirections"
-        description="A list of all the redirections in your account."
+        title="Redirects"
+        description="A list of all the redirects in your account."
       />
       <Table
         columns={[
@@ -67,14 +69,10 @@ const RedirectionsHome: NextPage = () => {
           ...entity,
           destinations: entity.destinations.map(({ url }) => url).join(", "),
         }))}
-        onEditClick={(entityIndex) => {
+        onEditClick={(entityIndex, entity) => {
           console.debug("Editing entity", entityIndex);
 
-          setPageState((oldState) => ({
-            ...oldState,
-            modalIsOpen: true,
-            selectedEntity: entitiesResponse?.results[entityIndex],
-          }));
+          router.push(`/redirects/${entity.id}/destinations`);
         }}
         onDeleteClick={async (entityIndex, item) => {
           console.debug("Deleting entity", entityIndex);
@@ -148,4 +146,4 @@ const RedirectionsHome: NextPage = () => {
   );
 };
 
-export default RedirectionsHome;
+export default RedirectsHome;

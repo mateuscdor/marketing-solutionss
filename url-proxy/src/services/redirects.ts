@@ -1,8 +1,9 @@
+import { Destination } from "../entities/Destination";
 import { Redirect } from "../entities/Redirect";
 import { api } from "./base";
 
-export class RedirectionsService {
-  path = "/redirections";
+export class RedirectsService {
+  path = "/redirects";
 
   async getMany(): Promise<{
     results: Redirect[];
@@ -22,5 +23,11 @@ export class RedirectionsService {
   }
   async delete(id: string): Promise<void> {
     await api.delete(`${this.path}/${id}`);
+  }
+
+  async getDestination(redirectId: string): Promise<Destination> {
+    return await api
+      .get(`${this.path}/${redirectId}/destination`)
+      .then(({ data }) => data.destination);
   }
 }

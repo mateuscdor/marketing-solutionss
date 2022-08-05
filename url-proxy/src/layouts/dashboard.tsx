@@ -11,7 +11,12 @@ import {
 import { SearchIcon } from "@heroicons/react/solid";
 
 const navigation = [
-  { name: "Redirections", href: "#", icon: HomeIcon, current: true },
+  {
+    name: "Redirects",
+    href: "/redirects",
+    icon: HomeIcon,
+    current: true,
+  },
 ];
 const userNavigation = [
   { name: "Your Profile", href: "#" },

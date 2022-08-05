@@ -1,16 +1,16 @@
 import { GetServerSideProps } from "next";
-import RedirectionsHome from "../../modules/redirections/home";
+import RedirectsHome from "../../../../modules/destinations";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { token } = context.query;
+  const { id } = context.params || {};
 
-  if (!token) {
+  if (!id) {
     return {
       notFound: true,
     };
   }
   return {
-    props: {},
+    props: { redirectId: id },
   };
 };
-export default RedirectionsHome;
+export default RedirectsHome;
