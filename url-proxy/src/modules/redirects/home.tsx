@@ -72,7 +72,12 @@ const RedirectsHome: NextPage = () => {
         onEditClick={(entityIndex, entity) => {
           console.debug("Editing entity", entityIndex);
 
-          router.push(`/redirects/${entity.id}/destinations`);
+          router.push({
+            pathname: `/redirects/${entity.id}/destinations`,
+            query: {
+              redirectSource: entity.source,
+            },
+          });
         }}
         onDeleteClick={async (entityIndex, item) => {
           console.debug("Deleting entity", entityIndex);

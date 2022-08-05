@@ -8,6 +8,7 @@ import { Destination } from "../../entities/Destination";
 import DashboardLayout from "../../layouts/dashboard";
 import { DestinationsService } from "../../services/destinations";
 import DestinationionModal from "./components/DestinationsModal";
+import { useRouter } from "next/router";
 
 const service = new DestinationsService();
 
@@ -17,8 +18,13 @@ export type PageState = {
 };
 export type DestinationsHomeProps = {
   redirectId: string;
+  redirectSource: string;
 };
-const DestinationsHome: NextPage<DestinationsHomeProps> = ({ redirectId }) => {
+const DestinationsHome: NextPage<DestinationsHomeProps> = ({
+  redirectId,
+  redirectSource,
+}) => {
+  const router = useRouter();
   const { data: entitiesResponse, mutate } = useSWR(
     `/api/destinations/${redirectId}/destinations`,
     () => {
@@ -49,6 +55,27 @@ const DestinationsHome: NextPage<DestinationsHomeProps> = ({ redirectId }) => {
 
   return (
     <DashboardLayout>
+      <div className="flex w-full justify-start">
+        <div className="p-2">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-6 w-6 cursor-pointer"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+            onClick={() => {
+              router.back();
+            }}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M7 16l-4-4m0 0l4-4m-4 4h18"
+            />
+          </svg>
+        </div>
+      </div>
       <ManageHeader
         onCreateClick={() => {
           console.debug("Creating entity");
@@ -58,7 +85,7 @@ const DestinationsHome: NextPage<DestinationsHomeProps> = ({ redirectId }) => {
             modalIsOpen: true,
           }));
         }}
-        title="Destinations"
+        title={`Destinations for ${redirectSource}`}
         description="A list of all the destinations in your account."
       />
       <Table
