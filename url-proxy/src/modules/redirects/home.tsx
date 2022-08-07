@@ -91,6 +91,18 @@ const RedirectsHome: NextPage = () => {
             onClick: ({ item, index }) => {
               console.debug("Editing entity", index);
 
+              setPageState((oldState) => ({
+                ...oldState,
+                selectedEntity: item,
+                modalIsOpen: true,
+              }));
+            },
+          },
+          {
+            label: "Destinations",
+            onClick: ({ item, index }) => {
+              console.debug("Going to destinations", index);
+
               router.push({
                 pathname: `/redirects/${item.id}/destinations`,
                 query: {

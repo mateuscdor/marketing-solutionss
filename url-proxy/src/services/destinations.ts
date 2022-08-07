@@ -24,7 +24,7 @@ export class DestinationsService {
   async create(body: Destination): Promise<void> {
     await api.post(this.path, body);
   }
-  async update(id: string, body: Destination): Promise<void> {
+  async update(id: string, body: Partial<Destination>): Promise<void> {
     await api.put(`${this.path}/${id}`, body);
   }
   async delete(id: string): Promise<void> {

@@ -18,7 +18,7 @@ export class RedirectsService {
   async create(body: Redirect): Promise<void> {
     await api.post(this.path, body);
   }
-  async update(id: string, body: Redirect): Promise<void> {
+  async update(id: string, body: Partial<Redirect>): Promise<void> {
     await api.put(`${this.path}/${id}`, body);
   }
   async delete(id: string): Promise<void> {
