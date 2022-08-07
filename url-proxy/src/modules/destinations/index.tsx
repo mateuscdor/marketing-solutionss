@@ -94,36 +94,64 @@ const DestinationsHome: NextPage<DestinationsHomeProps> = ({
             key: "url",
             label: "Url",
           },
+          {
+            key: "clicks",
+            label: "Clicks",
+          },
         ]}
         data={entitiesResponse?.results || []}
-        onEditClick={(entityIndex) => {
-          console.debug("Editing entity", entityIndex);
+        actions={[
+          {
+            label: "Edit",
+            onClick: ({ index }) => {
+              console.debug("Editing entity", index);
 
-          setPageState((oldState) => ({
-            ...oldState,
-            modalIsOpen: true,
-            selectedEntity: entitiesResponse?.results[entityIndex],
-          }));
-        }}
-        onDeleteClick={async (entityIndex, item) => {
-          console.debug("Deleting entity", entityIndex);
-
-          await service
-            .delete(item.id)
-            .then(() => {
-              mutate();
               setPageState((oldState) => ({
                 ...oldState,
-                modalIsOpen: false,
-                selectedEntity: undefined,
+                modalIsOpen: true,
+                selectedEntity: entitiesResponse?.results[index],
               }));
-            })
-            .catch((err) => {
-              toast(err?.message, {
-                type: "error",
-              });
-            });
-        }}
+            },
+          },
+          {
+            label: "Reset Clicks",
+            onClick: async ({ item }) => {
+              await service
+                .resetClicks(item.id)
+                .then(() => {
+                  mutate();
+                  setModalIsOpen(false);
+                })
+                .catch((err) => {
+                  toast(err?.message, {
+                    type: "error",
+                  });
+                });
+            },
+          },
+          {
+            label: "Delete",
+            onClick: async ({ item, index }) => {
+              console.debug("Deleting entity", index);
+
+              await service
+                .delete(item.id)
+                .then(() => {
+                  mutate();
+                  setPageState((oldState) => ({
+                    ...oldState,
+                    modalIsOpen: false,
+                    selectedEntity: undefined,
+                  }));
+                })
+                .catch((err) => {
+                  toast(err?.message, {
+                    type: "error",
+                  });
+                });
+            },
+          },
+        ]}
       />
       <DestinationionModal
         isOpen={pageState.modalIsOpen}

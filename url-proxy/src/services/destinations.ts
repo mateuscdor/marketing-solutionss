@@ -30,4 +30,10 @@ export class DestinationsService {
   async delete(id: string): Promise<void> {
     await api.delete(`${this.path}/${id}`);
   }
+
+  async resetClicks(id: string): Promise<void> {
+    await api.put(`${this.path}/${id}`, {
+      clicks: 0,
+    });
+  }
 }

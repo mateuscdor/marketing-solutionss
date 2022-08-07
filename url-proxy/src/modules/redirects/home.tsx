@@ -69,48 +69,59 @@ const RedirectsHome: NextPage = () => {
           ...entity,
           destinations: entity.destinations.map(({ url }) => url).join(", "),
         }))}
-        onEditClick={(entityIndex, entity) => {
-          console.debug("Editing entity", entityIndex);
+        actions={[
+          {
+            label: "Share",
+            onClick: async ({ item, index }) => {
+              console.debug("Sharing entity", index);
+              const origin =
+                typeof window !== "undefined" && window.location.origin
+                  ? window.location.origin
+                  : "";
+              const sharedLink = `${origin}/go?origin=${item.id}`;
 
-          router.push({
-            pathname: `/redirects/${entity.id}/destinations`,
-            query: {
-              redirectSource: entity.source,
-            },
-          });
-        }}
-        onDeleteClick={async (entityIndex, item) => {
-          console.debug("Deleting entity", entityIndex);
-
-          await service
-            .delete(item.id)
-            .then(() => {
-              mutate();
-              setPageState((oldState) => ({
-                ...oldState,
-                modalIsOpen: false,
-                selectedEntity: undefined,
-              }));
-            })
-            .catch((err) => {
-              toast(err?.message, {
-                type: "error",
+              toast("Link copied to clipboard", {
+                type: "success",
               });
-            });
-        }}
-        onShareClick={(index, item) => {
-          console.debug("Sharing entity", index);
-          const origin =
-            typeof window !== "undefined" && window.location.origin
-              ? window.location.origin
-              : "";
-          const sharedLink = `${origin}/go?origin=${item.id}`;
+              navigator.clipboard.writeText(sharedLink);
+            },
+          },
+          {
+            label: "Edit",
+            onClick: ({ item, index }) => {
+              console.debug("Editing entity", index);
 
-          toast("Link copied to clipboard", {
-            type: "success",
-          });
-          navigator.clipboard.writeText(sharedLink);
-        }}
+              router.push({
+                pathname: `/redirects/${item.id}/destinations`,
+                query: {
+                  redirectSource: item.source,
+                },
+              });
+            },
+          },
+          {
+            label: "Delete",
+            onClick: async ({ item, index }) => {
+              console.debug("Deleting entity", index);
+
+              await service
+                .delete(item.id)
+                .then(() => {
+                  mutate();
+                  setPageState((oldState) => ({
+                    ...oldState,
+                    modalIsOpen: false,
+                    selectedEntity: undefined,
+                  }));
+                })
+                .catch((err) => {
+                  toast(err?.message, {
+                    type: "error",
+                  });
+                });
+            },
+          },
+        ]}
       />
       <RedirectionModal
         isOpen={pageState.modalIsOpen}

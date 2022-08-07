@@ -1,34 +1,21 @@
-/* This example requires Tailwind CSS v2.0+ */
-const people = [
-  {
-    name: "Lindsay Walton",
-    title: "Front-end Developer",
-    email: "lindsay.walton@example.com",
-    role: "Member",
-  },
-  // More people...
-];
+import Action, { ActionProps } from "./action";
 
 export type TablePropsColumn = {
   key: string;
   label: string;
 };
+
+export type CustomAction = React.ReactNode;
+
+export type TableAction = Omit<ActionProps, "onClick"> & {
+  onClick: (props: { item: any; index: number }) => void;
+};
 export type TableProps = {
   columns: TablePropsColumn[];
+  actions: TableAction[];
   data: any[];
-  onEditClick?: (index: number, item: any) => void;
-  onDeleteClick?: (index: number, item: any) => void;
-  onShareClick?: (index: number, item: any) => void;
-
-  extraActionsComponent?: React.ReactNode;
 };
-const Table = ({
-  columns,
-  data,
-  onEditClick,
-  onDeleteClick,
-  onShareClick,
-}: TableProps) => {
+const Table = ({ columns, data, actions }: TableProps) => {
   return (
     <div className="-mx-4 mt-8 overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:-mx-6 md:mx-0 md:rounded-lg">
       <table className="min-w-full divide-y divide-gray-300">
@@ -58,33 +45,20 @@ const Table = ({
                   </td>
                 ))}
                 <td className="flex flex-col py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 justify-start items-start lg:space-x-2 lg:flex-row lg:justify-end">
-                  {onShareClick && (
-                    <button
-                      type="button"
-                      onClick={() => onShareClick(itemIndex, item)}
-                      className="text-indigo-600 hover:text-indigo-900"
-                    >
-                      Share
-                    </button>
-                  )}
-                  {onEditClick && (
-                    <button
-                      type="button"
-                      onClick={() => onEditClick(itemIndex, item)}
-                      className="text-indigo-600 hover:text-indigo-900"
-                    >
-                      Edit
-                    </button>
-                  )}
-                  {onDeleteClick && (
-                    <button
-                      type="button"
-                      onClick={() => onDeleteClick(itemIndex, item)}
-                      className="text-indigo-600 hover:text-indigo-900"
-                    >
-                      Delete
-                    </button>
-                  )}
+                  {actions.map((actionProps, index) => {
+                    return (
+                      <Action
+                        key={`TableAction-${index}`}
+                        {...actionProps}
+                        onClick={() =>
+                          actionProps.onClick({
+                            item,
+                            index: itemIndex,
+                          })
+                        }
+                      />
+                    );
+                  })}
                 </td>
               </tr>
             );
