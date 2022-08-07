@@ -1,8 +1,5 @@
 import { GetServerSideProps } from "next";
-import { DestinationModel } from "../db/mongoose/models/Destination";
-import { MongoId } from "../db/mongoose/utils";
-import { Redirect } from "../entities/Redirect";
-import { getKeyValuesByPattern, redisClient } from "../services/redis";
+import { RedirectionService } from "../services/backend/redirection";
 
 function GoPage() {
   return <div />;
@@ -11,28 +8,14 @@ function GoPage() {
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { origin } = context.query;
 
-  const filters = {
-    redirect: origin,
-    clicks: {
-      $lte: 1000,
-    },
-  };
+  const destination = await new RedirectionService().getDestination(
+    origin as string
+  );
 
-  const destination = await DestinationModel.findOneAndUpdate(
-    filters,
-    {
-      $inc: { clicks: 1 },
-    },
-    {
-      sort: {
-        clicks: -1,
-      },
-      new: true,
-    }
-  ).lean();
-
-  console.log({ destination, origin });
-
+  console.debug("Redirecting ", {
+    origin,
+    destination,
+  });
   if (!destination) {
     return {
       notFound: true,
