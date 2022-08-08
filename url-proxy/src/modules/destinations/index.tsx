@@ -10,6 +10,7 @@ import DestinationionModal from "./components/DestinationsModal";
 import { useRouter } from "next/router";
 import { useAuthStore } from "../../shared/state";
 import { omit } from "lodash";
+import truncate from "lodash/truncate";
 
 const service = new DestinationsService();
 
@@ -88,7 +89,7 @@ const DestinationsHome: NextPage<DestinationsHomeProps> = ({
             modalIsOpen: true,
           }));
         }}
-        title={`Destinations for ${redirectSource}`}
+        title={`Destinations for ${truncate(redirectSource, 25)}`}
         description="A list of all the destinations in your account."
       />
       <Table

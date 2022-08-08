@@ -1,4 +1,3 @@
-import type { NextPage } from "next";
 import { useCallback, useState } from "react";
 import useSWR from "swr";
 import { toast } from "react-toastify";
