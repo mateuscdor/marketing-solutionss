@@ -4,6 +4,7 @@ import { v4 as uuid } from "uuid";
 import { DestinationModel } from "../../../../db/mongoose/models/Destination";
 import { MongoId } from "../../../../db/mongoose/utils";
 import { Redirect } from "../../../../entities/Redirect";
+import { RedirectionService } from "../../../../services/backend/redirection";
 import { redisClient, getKeyValuesByPattern } from "../../../../services/redis";
 
 export default async function handler(
@@ -18,22 +19,9 @@ export default async function handler(
 
   switch (method) {
     case "GET":
-      const destination = await DestinationModel.findOneAndUpdate(
-        {
-          redirect: MongoId.stringToObjectId(id as string),
-          likes: {
-            $lte: 1000,
-          },
-        },
-        {
-          $inc: { likes: 1 },
-        },
-        {
-          sort: {
-            likes: -1,
-          },
-        }
-      ).lean();
+      const destination = await new RedirectionService().getDestination(
+        id as string
+      );
 
       if (!destination) {
         return res.status(404).json({});
