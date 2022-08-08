@@ -28,7 +28,11 @@ const DestinationsHome: NextPage<DestinationsHomeProps> = ({
 }) => {
   const authStore = useAuthStore();
   const router = useRouter();
-  const { data: entitiesResponse, mutate } = useSWR(
+  const {
+    data: entitiesResponse,
+    mutate,
+    isValidating,
+  } = useSWR(
     `/api/destinations/${redirectId}/destinations`,
     () => {
       return service.getMany({
@@ -95,6 +99,7 @@ const DestinationsHome: NextPage<DestinationsHomeProps> = ({
         description="A list of all the destinations in your account."
       />
       <Table
+        isLoading={isValidating}
         columns={[
           {
             key: "url",

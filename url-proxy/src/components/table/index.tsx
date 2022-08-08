@@ -6,6 +6,7 @@ export type TablePropsColumn = {
 };
 
 import truncate from "lodash/truncate";
+import Loading from "../loading";
 
 export type CustomAction = React.ReactNode;
 
@@ -16,11 +17,12 @@ export type TableProps = {
   columns: TablePropsColumn[];
   actions: TableAction[];
   data: any[];
+  isLoading?: boolean;
 };
-const Table = ({ columns, data, actions }: TableProps) => {
+const Table = ({ columns, data, actions, isLoading }: TableProps) => {
   return (
     <div className="-mx-4 mt-8 overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:-mx-6 md:mx-0 md:rounded-lg">
-      <table className="flex flex-col w-full bg-yello-400 table-fixed divide-y divide-gray-300">
+      <table className="relative flex flex-col w-full bg-yello-400 table-fixed divide-y divide-gray-300">
         <thead className="bg-gray-50 w-full">
           <tr className="w-full flex flex-row justify-between">
             {columns.map((column) => (
@@ -70,6 +72,11 @@ const Table = ({ columns, data, actions }: TableProps) => {
             );
           })}
         </tbody>
+        {isLoading && (
+          <div className="absolute right-6 top-2 w-4 h-4 border-none">
+            <Loading />
+          </div>
+        )}
       </table>
     </div>
   );

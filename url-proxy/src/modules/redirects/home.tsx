@@ -20,7 +20,11 @@ const RedirectsHome = () => {
   const router = useRouter();
   const authStore = useAuthStore();
 
-  const { data: entitiesResponse, mutate } = useSWR(
+  const {
+    data: entitiesResponse,
+    mutate,
+    isValidating,
+  } = useSWR(
     ["/api/redirects"],
     () => {
       return service.getMany({
@@ -63,6 +67,7 @@ const RedirectsHome = () => {
         description="A list of all the redirects in your account."
       />
       <Table
+        isLoading={isValidating}
         columns={[
           {
             key: "source",
