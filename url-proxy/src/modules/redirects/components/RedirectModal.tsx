@@ -39,6 +39,7 @@ const RedirectionModal = ({
 
   useEffect(() => {
     setValue("source", entity?.source || "");
+    setValue("owner", entity?.owner || "");
     setValue("destinations", entity?.destinations || []);
     setValue(
       "strategy",
@@ -89,6 +90,7 @@ const RedirectionModal = ({
                       onClick={() =>
                         append({
                           url: "",
+                          owner: entity?.owner as string,
                         })
                       }
                     >

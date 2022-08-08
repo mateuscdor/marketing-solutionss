@@ -5,6 +5,7 @@ export interface IDestinationSchema {
   url: string;
   redirect?: mongoose.Types.ObjectId | any;
   clicks?: number;
+  owner: string;
 }
 
 export const DestinationSchema = new mongoose.Schema<IDestinationSchema>({
@@ -15,6 +16,7 @@ export const DestinationSchema = new mongoose.Schema<IDestinationSchema>({
     type: mongoose.Types.ObjectId,
     ref: "Redirection",
   },
+  owner: String,
 });
 
 export const DestinationModel = (mongoose.models.Destination ||

@@ -10,6 +10,7 @@ import {
   XIcon,
 } from "@heroicons/react/outline";
 import { SearchIcon } from "@heroicons/react/solid";
+import { withAuthenticator } from "@aws-amplify/ui-react";
 
 const navigation = [
   {
@@ -277,4 +278,6 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   );
 };
 
-export default DashboardLayout;
+export default withAuthenticator<DashboardLayoutProps>(DashboardLayout as any, {
+  hideSignUp: true,
+});

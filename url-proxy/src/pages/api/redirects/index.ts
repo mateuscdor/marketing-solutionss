@@ -16,12 +16,14 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const { body, method } = req;
+  const { body, method, query } = req;
   await dbConnect();
 
   switch (method) {
     case "GET":
-      const redirects = await RedirectionModel.find()
+      const redirects = await RedirectionModel.find({
+        owner: query.owner,
+      })
         .populate("destinations")
         .lean();
 
@@ -38,7 +40,7 @@ export default async function handler(
       break;
     case "POST":
       const _id = new mongoose.Types.ObjectId();
-      const { destinations = [], ...redirect } = body;
+      const { destinations = [], owner, ...redirect } = body;
 
       const createdDestinations = await DestinationModel.create<
         IDestinationSchema[]
@@ -46,6 +48,7 @@ export default async function handler(
         destinations.map((destination: any) => ({
           ...destination,
           redirect: _id,
+          owner,
         }))
       );
 
@@ -53,6 +56,7 @@ export default async function handler(
         ...redirect,
         destinations: createdDestinations.map(({ _id }) => _id),
         _id,
+        owner,
       };
 
       const createdRedirectionModel = await (
