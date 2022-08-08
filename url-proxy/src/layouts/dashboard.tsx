@@ -11,6 +11,7 @@ import {
 } from "@heroicons/react/outline";
 import { SearchIcon } from "@heroicons/react/solid";
 import { withAuthenticator } from "@aws-amplify/ui-react";
+import Image from "next/image";
 import { useAuthStore } from "../shared/state";
 import FullscreenLoading from "../components/loading/fullscreen";
 
@@ -105,11 +106,12 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                       </button>
                     </div>
                   </Transition.Child>
-                  <div className="flex-shrink-0 flex items-center px-4">
-                    <img
-                      className="h-8 w-auto"
-                      src="https://tailwindui.com/img/logos/workflow-logo-indigo-300-mark-white-text.svg"
-                      alt="Workflow"
+                  <div className="flex-shrink-0 flex justify-center items-center px-4">
+                    <Image
+                      src="/logo.png"
+                      width={120}
+                      height={120}
+                      alt="Irbano logo"
                     />
                   </div>
                   <div className="mt-5 flex-1 h-0 overflow-y-auto">
@@ -147,11 +149,12 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
         <div className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0">
           {/* Sidebar component, swap this element with another sidebar if you like */}
           <div className="flex flex-col flex-grow pt-5 bg-indigo-700 overflow-y-auto">
-            <div className="flex items-center flex-shrink-0 px-4">
-              <img
-                className="h-8 w-auto"
-                src="https://tailwindui.com/img/logos/workflow-logo-indigo-300-mark-white-text.svg"
-                alt="Workflow"
+            <div className="flex justify-center items-center flex-shrink-0 px-4">
+              <Image
+                src="/logo.png"
+                width={120}
+                height={120}
+                alt="Irbano logo"
               />
             </div>
             <div className="mt-5 flex-1 flex flex-col">
