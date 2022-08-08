@@ -16,7 +16,7 @@ export type PageState = {
   selectedEntity?: Redirect;
   modalIsOpen: boolean;
 };
-const RedirectsHome: NextPage = () => {
+const RedirectsHome = () => {
   const router = useRouter();
   const { data: entitiesResponse, mutate } = useSWR(
     "/api/redirects",

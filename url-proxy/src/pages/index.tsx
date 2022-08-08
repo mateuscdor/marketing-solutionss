@@ -1,13 +1,4 @@
-import { GetServerSideProps } from "next";
+import { withAuthenticator } from "@aws-amplify/ui-react";
+import RedirectsHome from "../modules/redirects/home";
 
-function Home() {
-  return <div />;
-}
-
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  return {
-    notFound: true,
-  };
-};
-
-export default Home;
+export default withAuthenticator(RedirectsHome);

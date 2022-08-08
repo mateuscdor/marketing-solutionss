@@ -1,5 +1,6 @@
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { Auth } from "aws-amplify";
 import { Fragment, useState } from "react";
 import { Dialog, Menu, Transition } from "@headlessui/react";
 import {
@@ -19,9 +20,15 @@ const navigation = [
   },
 ];
 const userNavigation = [
-  { name: "Your Profile", href: "#" },
-  { name: "Settings", href: "#" },
-  { name: "Sign out", href: "#" },
+  // { name: "Your Profile", href: "#", onClick: () => {} },
+  // { name: "Settings", href: "#", onClick: () => {} },
+  {
+    name: "Sign out",
+    href: undefined,
+    onClick: async () => {
+      await Auth.signOut().catch((err) => console.error("Logout error", err));
+    },
+  },
 ];
 
 function classNames(...classes: any[]) {
@@ -224,21 +231,36 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                     leaveTo="transform opacity-0 scale-95"
                   >
                     <Menu.Items className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
-                      {userNavigation.map((item) => (
-                        <Menu.Item key={item.name}>
-                          {({ active }) => (
-                            <a
-                              href={item.href}
-                              className={classNames(
-                                active ? "bg-gray-100" : "",
-                                "block px-4 py-2 text-sm text-gray-700"
-                              )}
-                            >
-                              {item.name}
-                            </a>
-                          )}
-                        </Menu.Item>
-                      ))}
+                      {userNavigation.map((item) => {
+                        return (
+                          <Menu.Item key={item.name}>
+                            {({ active }) =>
+                              item.href ? (
+                                <a
+                                  href={item.href}
+                                  className={classNames(
+                                    active ? "bg-gray-100" : "",
+                                    "block px-4 py-2 text-sm text-gray-700"
+                                  )}
+                                >
+                                  {item.name}
+                                </a>
+                              ) : (
+                                <button
+                                  type="button"
+                                  onClick={item.onClick}
+                                  className={classNames(
+                                    active ? "bg-gray-100" : "",
+                                    "block px-4 py-2 text-sm text-gray-700"
+                                  )}
+                                >
+                                  {item.name}
+                                </button>
+                              )
+                            }
+                          </Menu.Item>
+                        );
+                      })}
                     </Menu.Items>
                   </Transition>
                 </Menu>
