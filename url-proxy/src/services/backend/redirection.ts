@@ -18,7 +18,12 @@ export class RedirectionService {
 
     if (!redirect) return null;
 
-    await redisClient.set(cacheKey, JSON.stringify(MongoId.toId(redirect)));
+    await redisClient.set(
+      cacheKey,
+      JSON.stringify(MongoId.toId(redirect)),
+      "EX",
+      10
+    );
 
     return MongoId.toId(redirect) as Redirect;
   }
