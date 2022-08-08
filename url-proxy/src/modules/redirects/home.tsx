@@ -70,8 +70,13 @@ const RedirectsHome = () => {
         isLoading={isValidating}
         columns={[
           {
+            key: "name",
+            label: "Name",
+          },
+          {
             key: "source",
-            label: "Source",
+            label: "Source Url",
+            hiddenOnMobile: true,
           },
         ]}
         data={(entitiesResponse?.results || []).map((entity) => ({
@@ -153,11 +158,14 @@ const RedirectsHome = () => {
         onCreate={async (data) => {
           console.debug("Creating", data);
 
+          const body = {
+            ...data,
+            owner: authStore.user?.id as string,
+            user: authStore.user,
+          };
+
           await service
-            .create({
-              ...data,
-              owner: authStore.user?.id as string,
-            })
+            .create(body)
             .then(() => {
               mutate();
               setModalIsOpen(false);

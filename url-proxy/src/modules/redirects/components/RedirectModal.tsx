@@ -39,6 +39,7 @@ const RedirectionModal = ({
 
   useEffect(() => {
     setValue("source", entity?.source || "");
+    setValue("name", entity?.name || "");
     setValue("owner", entity?.owner || "");
     setValue(
       "strategy",
@@ -74,7 +75,14 @@ const RedirectionModal = ({
 
             <div className="flex flex-col py-6 space-y-8">
               <InputTextGroup
-                label="Source"
+                label="Name"
+                errorMessage={errors?.name?.message}
+                inputProps={register("name", {
+                  required: true,
+                })}
+              />
+              <InputTextGroup
+                label="Source URL"
                 errorMessage={errors?.source?.message}
                 inputProps={register("source", {
                   required: true,
@@ -90,6 +98,7 @@ const RedirectionModal = ({
                         append({
                           url: "",
                           owner: entity?.owner as string,
+                          name: "",
                         })
                       }
                     >
@@ -97,30 +106,52 @@ const RedirectionModal = ({
                     </button>
                   </div>
                   {fields.map((field: any, index: number) => {
-                    const fieldId =
+                    const urlFieldId =
                       `destinations.${index}.url` as `destinations.${number}.url`;
 
-                    const errorMessage = get(
+                    const nameFieldId =
+                      `destinations.${index}.name` as `destinations.${number}.name`;
+
+                    const urlErrorMessage = get(
                       errors,
                       `destinations.${index}.url.message`
                     );
+                    const nameErrorMessage = get(
+                      errors,
+                      `destinations.${index}.name.message`
+                    );
                     return (
-                      <div key={field.id} className="flex w-full items-center">
-                        <div className="w-full">
-                          <InputTextGroup
-                            errorMessage={errorMessage}
-                            label={`Destination ${index + 1}`}
-                            inputProps={register(fieldId, {
-                              minLength: {
-                                value: 5,
-                                message: "Must be greather than 4",
-                              },
-                              required: true,
-                            })}
-                          />
+                      <div
+                        key={field.id}
+                        className="flex flex-row w-full items-center"
+                      >
+                        <div className="flex flex-col w-full justify-around">
+                          <span className="font-semibold">{`Destination ${
+                            index + 1
+                          }`}</span>
+                          <div className="flex w-full justify-around space-x-2">
+                            <InputTextGroup
+                              errorMessage={nameErrorMessage}
+                              label="Name"
+                              inputProps={register(nameFieldId, {
+                                required: true,
+                              })}
+                            />
+                            <InputTextGroup
+                              errorMessage={urlErrorMessage}
+                              label="Url"
+                              inputProps={register(urlFieldId, {
+                                minLength: {
+                                  value: 5,
+                                  message: "Must be greather than 4",
+                                },
+                                required: true,
+                              })}
+                            />
+                          </div>
                         </div>
                         <button
-                          className=" h-min inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                          className="h-min inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                           type="button"
                           onClick={() => remove(index)}
                         >

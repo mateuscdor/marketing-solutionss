@@ -11,6 +11,7 @@ import { useRouter } from "next/router";
 import { useAuthStore } from "../../shared/state";
 import { omit } from "lodash";
 import truncate from "lodash/truncate";
+import { resumeLongText } from "../../utils";
 
 const service = new DestinationsService();
 
@@ -102,15 +103,26 @@ const DestinationsHome: NextPage<DestinationsHomeProps> = ({
         isLoading={isValidating}
         columns={[
           {
-            key: "url",
-            label: "Url",
+            key: "name",
+            label: "Name",
           },
+
           {
             key: "clicks",
             label: "Clicks",
           },
+          {
+            key: "url",
+            label: "Url",
+            hiddenOnMobile: true,
+          },
         ]}
-        data={entitiesResponse?.results || []}
+        data={(entitiesResponse?.results || []).map((destination) => {
+          return {
+            ...destination,
+            url: destination.url,
+          };
+        })}
         actions={[
           {
             label: "Edit",

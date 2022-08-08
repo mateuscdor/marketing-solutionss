@@ -1,8 +1,10 @@
+import clsx from "clsx";
 import Action, { ActionProps } from "./action";
 
 export type TablePropsColumn = {
   key: string;
   label: string;
+  hiddenOnMobile?: boolean;
 };
 
 import truncate from "lodash/truncate";
@@ -29,7 +31,10 @@ const Table = ({ columns, data, actions, isLoading }: TableProps) => {
               <th
                 key={`column-${column.key}`}
                 scope="col"
-                className="py-3.5 pl-4 pr-3 w-autotext-left  flex justify-start text-sm font-semibold text-gray-900 sm:pl-6"
+                className={clsx(
+                  "py-3.5 pl-4 pr-3 w-autotext-left flex justify-start text-sm font-semibold text-gray-900 sm:pl-6",
+                  !!column.hiddenOnMobile && "hidden lg:flex"
+                )}
               >
                 {column.label}
               </th>
@@ -45,8 +50,11 @@ const Table = ({ columns, data, actions, isLoading }: TableProps) => {
               <tr key={item.id} className="flex flex-row items-center w-auto ">
                 {columns.map((column) => (
                   <td
-                    className="w-full"
                     key={`column-${item.id}-${column.key}`}
+                    className={clsx(
+                      "w-full",
+                      !!column.hiddenOnMobile && "hidden lg:flex"
+                    )}
                   >
                     <span>{truncate(item[column.key], { length: 36 })}</span>
                   </td>

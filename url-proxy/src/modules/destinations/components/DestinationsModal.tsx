@@ -25,6 +25,7 @@ const DestinationModal = ({
 
   useEffect(() => {
     setValue("url", entity?.url || "");
+    setValue("name", entity?.name || "");
     setValue("id", entity?.id || "");
     setValue("owner", entity?.owner || "");
   }, [entity, setValue]);
@@ -55,7 +56,14 @@ const DestinationModal = ({
 
             <div className="flex flex-col py-6 space-y-8">
               <InputTextGroup
-                label="Source"
+                label="Name"
+                errorMessage={errors?.name?.message}
+                inputProps={register("name", {
+                  required: true,
+                })}
+              />
+              <InputTextGroup
+                label="Source Url"
                 errorMessage={errors?.url?.message}
                 inputProps={register("url", {
                   required: true,
