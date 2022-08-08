@@ -1,0 +1,25 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-urlproxy-dev-215041-authRole",
+      "UnauthRoleArn": "arn:aws:iam::618097715956:role/amplify-urlproxy-dev-215041-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::618097715956:role/amplify-urlproxy-dev-215041-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-urlproxy-dev-215041-deployment",
+      "UnauthRoleName": "amplify-urlproxy-dev-215041-unauthRole",
+      "StackName": "amplify-urlproxy-dev-215041",
+      "StackId": "arn:aws:cloudformation:us-east-1:618097715956:stack/amplify-urlproxy-dev-215041/21dd50b0-16b4-11ed-a9dc-0a8210ee62b5",
+      "AmplifyAppId": "dpoi0kbbldsw4"
+    },
+    "categories": {
+      "auth": {
+        "urlproxydff392b9": {
+          "userPoolId": "us-east-1_47eR33Z9N",
+          "userPoolName": "url-proxy",
+          "webClientId": "6kk628lp02pae1u9rb3s6ucpok",
+          "nativeClientId": "6kk628lp02pae1u9rb3s6ucpok"
+        }
+      }
+    }
+  }
+}

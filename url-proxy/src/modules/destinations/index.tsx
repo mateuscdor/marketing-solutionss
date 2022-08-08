@@ -9,6 +9,8 @@ import DashboardLayout from "../../layouts/dashboard";
 import { DestinationsService } from "../../services/destinations";
 import DestinationionModal from "./components/DestinationsModal";
 import { useRouter } from "next/router";
+import { useAuthStore } from "../../shared/state";
+import { omit } from "lodash";
 
 const service = new DestinationsService();
 
@@ -24,12 +26,14 @@ const DestinationsHome: NextPage<DestinationsHomeProps> = ({
   redirectId,
   redirectSource,
 }) => {
+  const authStore = useAuthStore();
   const router = useRouter();
   const { data: entitiesResponse, mutate } = useSWR(
     `/api/destinations/${redirectId}/destinations`,
     () => {
       return service.getMany({
         redirectId,
+        owner: authStore.user?.id,
       });
     },
     {
@@ -161,6 +165,7 @@ const DestinationsHome: NextPage<DestinationsHomeProps> = ({
           const body = {
             ...data,
             redirect: redirectId as any,
+            owner: authStore.user?.id as string,
           };
 
           console.debug("Creating", body);
@@ -180,7 +185,7 @@ const DestinationsHome: NextPage<DestinationsHomeProps> = ({
           console.debug("Updating", data);
 
           await service
-            .update(id, data)
+            .update(id, omit(data, "owner"))
             .then(() => {
               mutate();
               setModalIsOpen(false);

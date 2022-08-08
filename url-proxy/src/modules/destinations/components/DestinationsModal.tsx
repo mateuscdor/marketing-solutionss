@@ -26,6 +26,7 @@ const DestinationModal = ({
   useEffect(() => {
     setValue("url", entity?.url || "");
     setValue("id", entity?.id || "");
+    setValue("owner", entity?.owner || "");
   }, [entity, setValue]);
 
   const title = useMemo(() => {

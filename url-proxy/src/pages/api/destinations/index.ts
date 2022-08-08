@@ -11,12 +11,14 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const { body, method } = req;
+  const { body, method, query } = req;
   await dbConnect();
 
   switch (method) {
     case "GET":
-      const destinations = await DestinationModel.find()
+      const destinations = await DestinationModel.find({
+        owner: query.owner,
+      })
         .populate("redirect")
         .lean();
 

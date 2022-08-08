@@ -9,6 +9,8 @@ import DashboardLayout from "../../layouts/dashboard";
 import { RedirectsService } from "../../services/redirects";
 import RedirectionModal from "./components/RedirectModal";
 import { useRouter } from "next/router";
+import { useAuthStore } from "../../shared/state";
+import { omit } from "lodash";
 
 const service = new RedirectsService();
 
@@ -16,12 +18,15 @@ export type PageState = {
   selectedEntity?: Redirect;
   modalIsOpen: boolean;
 };
-const RedirectsHome: NextPage = () => {
+const RedirectsHome = () => {
   const router = useRouter();
+  const authStore = useAuthStore();
   const { data: entitiesResponse, mutate } = useSWR(
     "/api/redirects",
     () => {
-      return service.getMany();
+      return service.getMany({
+        owner: authStore.user?.id,
+      });
     },
     {
       onError: (err) => {
@@ -143,7 +148,10 @@ const RedirectsHome: NextPage = () => {
           console.debug("Creating", data);
 
           await service
-            .create(data)
+            .create({
+              ...data,
+              owner: authStore.user?.id as string,
+            })
             .then(() => {
               mutate();
               setModalIsOpen(false);
@@ -158,7 +166,7 @@ const RedirectsHome: NextPage = () => {
           console.debug("Updating", data);
 
           await service
-            .update(id, data)
+            .update(id, omit(data, ["destinations", "owner"]))
             .then(() => {
               mutate();
               setModalIsOpen(false);

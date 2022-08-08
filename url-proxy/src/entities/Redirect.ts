@@ -6,4 +6,5 @@ export type Redirect = {
   destinations?: Destination[];
   strategy: string;
   maxClicksPerDestination?: number;
+  owner: string;
 };

@@ -2,13 +2,21 @@ import { Destination } from "../entities/Destination";
 import { Redirect } from "../entities/Redirect";
 import { api } from "./base";
 
+export type GetManyRedirects = {
+  owner?: string;
+};
+
 export class RedirectsService {
   path = "/redirects";
 
-  async getMany(): Promise<{
+  async getMany({ owner }: GetManyRedirects): Promise<{
     results: Redirect[];
   }> {
-    const { data } = await api.get(this.path);
+    const { data } = await api.get(this.path, {
+      params: {
+        owner,
+      },
+    });
 
     return data;
   }

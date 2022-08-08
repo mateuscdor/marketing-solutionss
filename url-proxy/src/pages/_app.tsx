@@ -1,8 +1,18 @@
 import "../styles/globals.css";
 import type { AppProps } from "next/app";
+import { Amplify, Auth } from "aws-amplify";
+import awsconfig from "../aws-exports";
+import "@aws-amplify/ui-react/styles.css";
+import AuthContext from "../shared/contexts/AuthContext";
+
+Amplify.configure(awsconfig);
 
 function MyApp({ Component, pageProps }: AppProps) {
-  return <Component {...pageProps} />;
+  return (
+    <AuthContext>
+      <Component {...pageProps} />
+    </AuthContext>
+  );
 }
 
 export default MyApp;
