@@ -3,4 +3,8 @@ export const REDIRECT_STRATEGIES = {
     id: "clicksPerDestination",
     label: "Clicks per destination",
   },
+  uniqueClicksPerDestination: {
+    id: "uniqueClicksPerDestination",
+    label: "Unique clicks per destination",
+  },
 };

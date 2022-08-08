@@ -1,3 +1,4 @@
+import type { NextRequest } from "next/server";
 import { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
@@ -31,7 +32,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       ? forwarded.split(/, /)[0]
       : req.socket.remoteAddress;
 
-  console.log(ip);
+  console.log(req.headers, req.socket);
 
   return {
     props: {

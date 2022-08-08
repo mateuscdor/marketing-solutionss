@@ -7,13 +7,16 @@ export default async function handler(
 ) {
   const {
     method,
-    query: { id },
+    query: { id, userIp },
   } = req;
 
   switch (method) {
     case "GET":
       const destination = await new RedirectionService().getDestination(
-        id as string
+        id as string,
+        {
+          ip: userIp as string,
+        }
       );
 
       if (!destination) {

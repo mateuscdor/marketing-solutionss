@@ -33,9 +33,16 @@ export class RedirectsService {
     await api.delete(`${this.path}/${id}`);
   }
 
-  async getDestination(redirectId: string): Promise<Destination> {
+  async getDestination(
+    redirectId: string,
+    userData: any
+  ): Promise<Destination> {
     return await api
-      .get(`${this.path}/${redirectId}/destination`)
+      .get(`${this.path}/${redirectId}/destination`, {
+        params: {
+          ...userData,
+        },
+      })
       .then(({ data }) => data.destination);
   }
 }

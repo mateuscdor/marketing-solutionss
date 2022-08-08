@@ -73,11 +73,6 @@ const RedirectsHome = () => {
             key: "name",
             label: "Name",
           },
-          {
-            key: "source",
-            label: "Source Url",
-            hiddenOnMobile: true,
-          },
         ]}
         data={(entitiesResponse?.results || []).map((entity) => ({
           ...entity,
@@ -122,7 +117,7 @@ const RedirectsHome = () => {
               router.push({
                 pathname: `/redirects/${item.id}/destinations`,
                 query: {
-                  redirectSource: item.source,
+                  redirectSource: item.name,
                 },
               });
             },
