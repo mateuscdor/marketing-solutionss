@@ -1,8 +1,9 @@
 import { useAuthStore } from "../state";
 import { Hub, HubCallback } from "@aws-amplify/core";
 
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import { toast } from "react-toastify";
+import { Auth } from "aws-amplify";
 
 export type AuthContextProps = {
   children: React.ReactNode;
@@ -11,27 +12,52 @@ export type AuthContextProps = {
 const AuthContext = ({ children }: AuthContextProps) => {
   const authStore = useAuthStore();
 
+  const updateUserState = useCallback((cognitoUser: any) => {
+    if (!cognitoUser) {
+      return authStore.setUser(null);
+    }
+    const {
+      accessToken: { jwtToken },
+    } = cognitoUser.signInUserSession;
+
+    const {
+      email,
+      sub: id,
+      email_verified: emailVerified,
+    } = cognitoUser.attributes;
+    authStore.setUser({
+      id,
+      email,
+      emailVerified,
+      jwtToken,
+    });
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    async function recognizeState() {
+      await Auth.currentAuthenticatedUser()
+        .then(updateUserState)
+        .catch((err) => console.error("currentAuthenticatedUser error", err));
+    }
+
+    recognizeState();
+  }, [updateUserState]);
+
   const listener: HubCallback = (data) => {
     switch (data.payload.event) {
       case "signIn":
         const { attributes } = data.payload.data;
 
-        const {
-          accessToken: { jwtToken },
-        } = data.payload.data.signInUserSession;
-
-        const { email, sub: id, email_verified: emailVerified } = attributes;
-        authStore.setUser({
-          id,
-          email,
-          emailVerified,
-          jwtToken,
-        });
+        console.log(data.payload.data);
+        updateUserState(data.payload.data);
 
         break;
       case "signUp":
         break;
       case "signOut":
+        console.info("user sign out");
         authStore.setUser(null);
         break;
       case "signIn_failure":

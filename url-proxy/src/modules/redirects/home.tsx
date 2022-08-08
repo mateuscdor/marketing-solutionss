@@ -5,7 +5,6 @@ import { toast } from "react-toastify";
 import ManageHeader from "../../components/headers/manage";
 import Table from "../../components/table";
 import { Redirect } from "../../entities/Redirect";
-import DashboardLayout from "../../layouts/dashboard";
 import { RedirectsService } from "../../services/redirects";
 import RedirectionModal from "./components/RedirectModal";
 import { useRouter } from "next/router";
@@ -21,8 +20,9 @@ export type PageState = {
 const RedirectsHome = () => {
   const router = useRouter();
   const authStore = useAuthStore();
+
   const { data: entitiesResponse, mutate } = useSWR(
-    "/api/redirects",
+    ["/api/redirects"],
     () => {
       return service.getMany({
         owner: authStore.user?.id,
@@ -50,7 +50,7 @@ const RedirectsHome = () => {
   }, []);
 
   return (
-    <DashboardLayout>
+    <div className="flex flex-col w-full h-full">
       <ManageHeader
         onCreateClick={() => {
           console.debug("Creating entity");
@@ -180,7 +180,7 @@ const RedirectsHome = () => {
             });
         }}
       />
-    </DashboardLayout>
+    </div>
   );
 };
 

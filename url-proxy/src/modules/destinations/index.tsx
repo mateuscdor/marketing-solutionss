@@ -5,7 +5,6 @@ import { toast } from "react-toastify";
 import ManageHeader from "../../components/headers/manage";
 import Table from "../../components/table";
 import { Destination } from "../../entities/Destination";
-import DashboardLayout from "../../layouts/dashboard";
 import { DestinationsService } from "../../services/destinations";
 import DestinationionModal from "./components/DestinationsModal";
 import { useRouter } from "next/router";
@@ -58,7 +57,7 @@ const DestinationsHome: NextPage<DestinationsHomeProps> = ({
   }, []);
 
   return (
-    <DashboardLayout>
+    <div className="flex flex-col w-full h-full">
       <div className="flex w-full justify-start">
         <div className="p-2">
           <svg
@@ -197,7 +196,7 @@ const DestinationsHome: NextPage<DestinationsHomeProps> = ({
             });
         }}
       />
-    </DashboardLayout>
+    </div>
   );
 };
 
