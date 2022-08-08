@@ -30,12 +30,19 @@ const AuthContext = ({ children }: AuthContextProps) => {
       get(cognitoUser, "username", "")
     );
     const emailVerified = get(cognitoUser, "attributes.email_verified", true);
+    const roles = get(
+      cognitoUser,
+      "signInUserSession.accessToken.payload.cognito:groups",
+      []
+    );
 
+    console.debug("updating user state", cognitoUser, roles);
     authStore.setUser({
       id,
       email,
       emailVerified,
       jwtToken,
+      roles,
     });
 
     // eslint-disable-next-line react-hooks/exhaustive-deps

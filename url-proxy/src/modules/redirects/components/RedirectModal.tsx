@@ -38,7 +38,6 @@ const RedirectionModal = ({
   }, [entity]);
 
   useEffect(() => {
-    setValue("source", entity?.source || "");
     setValue("name", entity?.name || "");
     setValue("owner", entity?.owner || "");
     setValue(
@@ -78,13 +77,6 @@ const RedirectionModal = ({
                 label="Name"
                 errorMessage={errors?.name?.message}
                 inputProps={register("name", {
-                  required: true,
-                })}
-              />
-              <InputTextGroup
-                label="Source URL"
-                errorMessage={errors?.source?.message}
-                inputProps={register("source", {
                   required: true,
                 })}
               />
@@ -192,7 +184,10 @@ const RedirectionModal = ({
                 value: strategy.id,
               }))}
             />
-            {strategy === REDIRECT_STRATEGIES.clicksPerDestination.id && (
+            {[
+              REDIRECT_STRATEGIES.clicksPerDestination.id,
+              REDIRECT_STRATEGIES.uniqueClicksPerDestination.id,
+            ].includes(strategy) && (
               <InputTextGroup
                 label="Max clicks per destination"
                 errorMessage={errors?.maxClicksPerDestination?.message}

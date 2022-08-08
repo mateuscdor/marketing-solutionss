@@ -4,6 +4,7 @@ export type LoggedUser = {
   email: string;
   emailVerified: boolean;
   jwtToken: string;
+  roles: string[];
   id: string;
 };
 export type AuthState = {
