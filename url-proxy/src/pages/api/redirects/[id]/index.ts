@@ -26,7 +26,7 @@ export default async function userHandler(
     case "PUT":
       await RedirectionModel.updateOne(
         {
-          id,
+          _id: id,
         },
         {
           $set: body,
