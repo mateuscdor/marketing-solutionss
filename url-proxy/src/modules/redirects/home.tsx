@@ -72,7 +72,9 @@ const RedirectsHome = () => {
         ]}
         data={(entitiesResponse?.results || []).map((entity) => ({
           ...entity,
-          destinations: entity.destinations.map(({ url }) => url).join(", "),
+          destinations: (entity.destinations || [])
+            .map(({ url }) => url)
+            .join(", "),
         }))}
         actions={[
           {
