@@ -5,6 +5,8 @@ export type TablePropsColumn = {
   label: string;
 };
 
+import truncate from "lodash/truncate";
+
 export type CustomAction = React.ReactNode;
 
 export type TableAction = Omit<ActionProps, "onClick"> & {
@@ -18,33 +20,37 @@ export type TableProps = {
 const Table = ({ columns, data, actions }: TableProps) => {
   return (
     <div className="-mx-4 mt-8 overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:-mx-6 md:mx-0 md:rounded-lg">
-      <table className="min-w-full divide-y divide-gray-300">
-        <thead className="bg-gray-50">
-          <tr>
+      <table className="flex flex-col w-full bg-yello-400 table-fixed divide-y divide-gray-300">
+        <thead className="bg-gray-50 w-full">
+          <tr className="w-full flex flex-row justify-between">
             {columns.map((column) => (
               <th
                 key={`column-${column.key}`}
                 scope="col"
-                className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6"
+                className="py-3.5 pl-4 pr-3 w-autotext-left  flex justify-start text-sm font-semibold text-gray-900 sm:pl-6"
               >
                 {column.label}
               </th>
             ))}
             <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
-              <span className="sr-only">Actions</span>
+              <span className="w-full sr-only">Actions</span>
             </th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-200 bg-white px-4">
+        <tbody className="flex flex-col  w-full divide-y divide-gray-200 px-4">
           {data.map((item, itemIndex) => {
             return (
-              <tr key={item.id}>
+              <tr key={item.id} className="flex flex-row items-center w-auto ">
                 {columns.map((column) => (
-                  <td key={`column-${item.id}-${column.key}`}>
-                    <span>{item[column.key]}</span>
+                  <td
+                    className="w-full"
+                    key={`column-${item.id}-${column.key}`}
+                  >
+                    <span>{truncate(item[column.key], { length: 36 })}</span>
                   </td>
                 ))}
-                <td className="flex flex-col py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 justify-start items-start lg:space-x-2 lg:flex-row lg:justify-end">
+
+                <td className="flex flex-col py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6 justify-start items-start lg:space-x-2 lg:flex-row lg:justify-end w-full">
                   {actions.map((actionProps, index) => {
                     return (
                       <Action
