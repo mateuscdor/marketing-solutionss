@@ -4,6 +4,7 @@ import { Hub, HubCallback } from "@aws-amplify/core";
 import React, { useCallback, useEffect } from "react";
 import { toast } from "react-toastify";
 import { Auth } from "aws-amplify";
+import get from "lodash/get";
 
 export type AuthContextProps = {
   children: React.ReactNode;
@@ -16,15 +17,20 @@ const AuthContext = ({ children }: AuthContextProps) => {
     if (!cognitoUser) {
       return authStore.setUser(null);
     }
-    const {
-      accessToken: { jwtToken },
-    } = cognitoUser.signInUserSession;
 
-    const {
-      email,
-      sub: id,
-      email_verified: emailVerified,
-    } = cognitoUser.attributes;
+    const jwtToken = get(
+      cognitoUser,
+      "signInUserSession.accessToken.jwtToken",
+      ""
+    );
+    const email = get(cognitoUser, "attributes.email", "");
+    const id = get(
+      cognitoUser,
+      "attributes.sub",
+      get(cognitoUser, "username", "")
+    );
+    const emailVerified = get(cognitoUser, "attributes.email_verified", true);
+
     authStore.setUser({
       id,
       email,
@@ -48,9 +54,7 @@ const AuthContext = ({ children }: AuthContextProps) => {
   const listener: HubCallback = (data) => {
     switch (data.payload.event) {
       case "signIn":
-        const { attributes } = data.payload.data;
-
-        console.log(data.payload.data);
+        console.info("user sign in", data.payload.data);
         updateUserState(data.payload.data);
 
         break;
