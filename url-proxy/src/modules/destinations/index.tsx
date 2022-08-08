@@ -89,7 +89,9 @@ const DestinationsHome: NextPage<DestinationsHomeProps> = ({
             modalIsOpen: true,
           }));
         }}
-        title={`Destinations for ${truncate(redirectSource, 25)}`}
+        title={`Destinations for ${truncate(redirectSource, {
+          length: 25,
+        })}`}
         description="A list of all the destinations in your account."
       />
       <Table
