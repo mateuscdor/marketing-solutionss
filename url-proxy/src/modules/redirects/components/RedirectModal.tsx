@@ -40,7 +40,6 @@ const RedirectionModal = ({
   useEffect(() => {
     setValue("source", entity?.source || "");
     setValue("owner", entity?.owner || "");
-    setValue("destinations", entity?.destinations || []);
     setValue(
       "strategy",
       entity?.strategy || REDIRECT_STRATEGIES.clicksPerDestination.id
