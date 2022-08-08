@@ -18,6 +18,7 @@ export default async function handler(
     case "GET":
       const destinations = await DestinationModel.find({
         owner: query.owner,
+        redirect: query.redirectId,
       })
         .populate("redirect")
         .lean();
