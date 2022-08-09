@@ -13,7 +13,7 @@ function GoPage({ origin, userIp }: any) {
     console.debug(`==> requesting destination ${origin} - ${userIp}`);
     new RedirectsService()
       .getDestination(origin, {
-        userIp,
+        ip: userIp,
       })
       .then((destination) => {
         if (destination) {
