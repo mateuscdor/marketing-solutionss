@@ -13,8 +13,11 @@ import { omit } from "lodash";
 import truncate from "lodash/truncate";
 import DeleteResourceModal from "../../components/modals/delete-resource";
 import ConfirmModal from "../../components/modals/confirm";
+import { ShareIcon } from "@heroicons/react/outline";
+import { RedirectsService } from "../../services/redirects";
 
 const service = new DestinationsService();
+const redirectsService = new RedirectsService();
 
 export type PageState = {
   selectedEntity?: Destination;
@@ -112,9 +115,28 @@ const DestinationsHome: NextPage<DestinationsHomeProps> = ({
             modalIsOpen: true,
           }));
         }}
-        title={`Destinations for ${truncate(redirectSource, {
-          length: 25,
-        })}`}
+        titleComponent={
+          <div className="flex items-center">
+            <h1 className="text-xl font-semibold text-gray-900 mr-4">{`Destinations for ${truncate(
+              redirectSource,
+              {
+                length: 25,
+              }
+            )}`}</h1>
+            <ShareIcon
+              className="h-6 w-6 cursor-pointer"
+              onClick={() => {
+                console.debug("Sharing redirect", redirectId);
+                const sharedLink = redirectsService.getShareUrl(redirectId);
+
+                toast("Link copied to clipboard", {
+                  type: "success",
+                });
+                navigator.clipboard.writeText(sharedLink);
+              }}
+            />
+          </div>
+        }
         description="A list of all the destinations in your account."
       />
       <Table

@@ -95,11 +95,7 @@ const RedirectsHome = () => {
             label: "Share",
             onClick: async ({ item, index }) => {
               console.debug("Sharing entity", index);
-              const origin =
-                typeof window !== "undefined" && window.location.origin
-                  ? window.location.origin
-                  : "";
-              const sharedLink = `${origin}/go?origin=${item.id}`;
+              const sharedLink = service.getShareUrl(item.id);
 
               toast("Link copied to clipboard", {
                 type: "success",
