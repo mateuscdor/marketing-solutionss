@@ -10,7 +10,15 @@ import {
   XIcon,
 } from "@heroicons/react/outline";
 import { SearchIcon } from "@heroicons/react/solid";
-import { withAuthenticator } from "@aws-amplify/ui-react";
+import {
+  useTheme,
+  View,
+  withAuthenticator,
+  Text,
+  useAuthenticator,
+  Button,
+  Heading,
+} from "@aws-amplify/ui-react";
 import Image from "next/image";
 import { useAuthStore } from "../shared/state";
 import FullscreenLoading from "../components/loading/fullscreen";
@@ -290,4 +298,65 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
 
 export default withAuthenticator<DashboardLayoutProps>(DashboardLayout as any, {
   hideSignUp: true,
+  components: {
+    // Header: () => {
+    //   const { tokens } = useTheme();
+
+    //   return (
+    //     <View textAlign="center" padding={tokens.space.large}>
+    //       <Image
+    //         alt="Amplify logo"
+    //         src="/logo.png"
+    //         layout="fixed"
+    //         width={180}
+    //         height={180}
+    //       />
+    //     </View>
+    //   );
+    // },
+    Footer: () => {
+      const { tokens } = useTheme();
+
+      return (
+        <View textAlign="center" padding={tokens.space.large}>
+          <Text color={tokens.colors.neutral[80]}>
+            &copy; All Rights Reserved
+          </Text>
+        </View>
+      );
+    },
+    SignIn: {
+      Header() {
+        const { tokens } = useTheme();
+
+        return (
+          <View textAlign="center" padding={tokens.space.large}>
+            <Heading
+              padding={`${tokens.space.xl} 0 0 ${tokens.space.xl}`}
+              level={3}
+            >
+              Sign in to your account
+            </Heading>
+          </View>
+        );
+      },
+      Footer() {
+        const { toResetPassword } = useAuthenticator();
+        const { tokens } = useTheme();
+
+        return (
+          <View textAlign="center" padding={tokens.space.large}>
+            <Button
+              fontWeight="normal"
+              onClick={toResetPassword}
+              size="small"
+              variation="link"
+            >
+              Reset Password
+            </Button>
+          </View>
+        );
+      },
+    },
+  },
 });
