@@ -12,6 +12,7 @@ import { useAuthStore } from "../../shared/state";
 import { omit } from "lodash";
 import truncate from "lodash/truncate";
 import DeleteResourceModal from "../../components/modals/delete-resource";
+import ConfirmModal from "../../components/modals/confirm";
 
 const service = new DestinationsService();
 
@@ -19,6 +20,7 @@ export type PageState = {
   selectedEntity?: Destination;
   modalIsOpen: boolean;
   deleteModalIsOpen: boolean;
+  resetCliksModalIsOpen: boolean;
 };
 export type DestinationsHomeProps = {
   redirectId: string;
@@ -55,6 +57,7 @@ const DestinationsHome: NextPage<DestinationsHomeProps> = ({
     selectedEntity: undefined,
     modalIsOpen: false,
     deleteModalIsOpen: false,
+    resetCliksModalIsOpen: false,
   });
 
   const setModalIsOpen = useCallback((modalIsOpen: boolean) => {
@@ -68,6 +71,12 @@ const DestinationsHome: NextPage<DestinationsHomeProps> = ({
     setPageState((oldState) => ({
       ...oldState,
       deleteModalIsOpen: isOpen,
+    }));
+  }, []);
+  const setResetClicksModalIsOpen = useCallback((isOpen: boolean) => {
+    setPageState((oldState) => ({
+      ...oldState,
+      resetCliksModalIsOpen: isOpen,
     }));
   }, []);
 
@@ -135,8 +144,8 @@ const DestinationsHome: NextPage<DestinationsHomeProps> = ({
         actions={[
           {
             label: "Edit",
-            onClick: ({ index }) => {
-              console.debug("Editing entity", index);
+            onClick: ({ item, index }) => {
+              console.debug("Editing entity", item.name);
 
               setPageState((oldState) => ({
                 ...oldState,
@@ -148,23 +157,19 @@ const DestinationsHome: NextPage<DestinationsHomeProps> = ({
           {
             label: "Reset Clicks",
             onClick: async ({ item }) => {
-              await service
-                .resetClicks(item.id)
-                .then(() => {
-                  mutate();
-                  setModalIsOpen(false);
-                })
-                .catch((err) => {
-                  toast(err?.message, {
-                    type: "error",
-                  });
-                });
+              console.debug("Opening reset clicks modal", item.name);
+
+              setPageState((oldState) => ({
+                ...oldState,
+                selectedEntity: item,
+                resetCliksModalIsOpen: true,
+              }));
             },
           },
           {
             label: "Delete",
-            onClick: async ({ item, index }) => {
-              console.debug("Opening delete entity modal", index);
+            onClick: async ({ item }) => {
+              console.debug("Opening delete entity modal", item.name);
 
               setPageState((oldState) => ({
                 ...oldState,
@@ -248,6 +253,37 @@ const DestinationsHome: NextPage<DestinationsHomeProps> = ({
             setDeleteModalIsOpen(false);
           }}
           setOpen={setDeleteModalIsOpen}
+        />
+      )}
+      {pageState.selectedEntity && (
+        <ConfirmModal
+          title={`Reset clicks of ${truncate(pageState.selectedEntity?.name, {
+            length: 20,
+          })}`}
+          description={`Are you sure you want to reset clicks of destination ${pageState.selectedEntity?.name}? The number of clicks will be changed to zero. This action cannot be undone.`}
+          isOpen={pageState.resetCliksModalIsOpen}
+          onConfirm={async () => {
+            console.debug("Reseting clicks", pageState!.selectedEntity!.name);
+            await service
+              .resetClicks(pageState!.selectedEntity!.id as string)
+              .then(() => {
+                mutate();
+                setPageState((oldState) => ({
+                  ...oldState,
+                  resetCliksModalIsOpen: false,
+                  selectedEntity: undefined,
+                }));
+              })
+              .catch((err) => {
+                toast(err?.message, {
+                  type: "error",
+                });
+              });
+          }}
+          onCancel={() => {
+            setResetClicksModalIsOpen(false);
+          }}
+          setOpen={setResetClicksModalIsOpen}
         />
       )}
     </div>
