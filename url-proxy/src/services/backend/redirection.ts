@@ -36,6 +36,7 @@ export class RedirectionService {
   ): Promise<Destination | null> {
     const redirect = await this.getRedirect(redirectId);
     if (!redirect) return null;
+    console.debug(`==> getting destination with strategy ${redirect.strategy}`);
     if (redirect.strategy === REDIRECT_STRATEGIES.clicksPerDestination.id) {
       const filters = {
         redirect: redirectId,
@@ -63,6 +64,9 @@ export class RedirectionService {
     if (
       redirect.strategy === REDIRECT_STRATEGIES.uniqueClicksPerDestination.id
     ) {
+      console.debug(
+        `==> getting destination with strategy ${redirect.strategy}`
+      );
       const { ip } = userData;
       const userCacheKey = `${redirect.id}-${ip}`;
       const cachedUser = await redisClient.get(userCacheKey);
