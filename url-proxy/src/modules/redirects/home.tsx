@@ -8,13 +8,15 @@ import { RedirectsService } from "../../services/redirects";
 import RedirectionModal from "./components/RedirectModal";
 import { useRouter } from "next/router";
 import { useAuthStore } from "../../shared/state";
-import { omit } from "lodash";
+import { omit, truncate } from "lodash";
+import DeleteResourceModal from "../../components/modals/delete-resource";
 
 const service = new RedirectsService();
 
 export type PageState = {
   selectedEntity?: Redirect;
   modalIsOpen: boolean;
+  deleteModalIsOpen: boolean;
 };
 const RedirectsHome = () => {
   const router = useRouter();
@@ -43,12 +45,20 @@ const RedirectsHome = () => {
   const [pageState, setPageState] = useState<PageState>({
     selectedEntity: undefined,
     modalIsOpen: false,
+    deleteModalIsOpen: false,
   });
 
   const setModalIsOpen = useCallback((modalIsOpen: boolean) => {
     setPageState((oldState) => ({
       ...oldState,
       modalIsOpen,
+    }));
+  }, []);
+
+  const setDeleteModalIsOpen = useCallback((isOpen: boolean) => {
+    setPageState((oldState) => ({
+      ...oldState,
+      deleteModalIsOpen: isOpen,
     }));
   }, []);
 
@@ -125,23 +135,12 @@ const RedirectsHome = () => {
           {
             label: "Delete",
             onClick: async ({ item, index }) => {
-              console.debug("Deleting entity", index);
-
-              await service
-                .delete(item.id)
-                .then(() => {
-                  mutate();
-                  setPageState((oldState) => ({
-                    ...oldState,
-                    modalIsOpen: false,
-                    selectedEntity: undefined,
-                  }));
-                })
-                .catch((err) => {
-                  toast(err?.message, {
-                    type: "error",
-                  });
-                });
+              console.debug("Opening delete entity modal", index);
+              setPageState((oldState) => ({
+                ...oldState,
+                selectedEntity: item,
+                deleteModalIsOpen: true,
+              }));
             },
           },
         ]}
@@ -187,6 +186,38 @@ const RedirectsHome = () => {
             });
         }}
       />
+      {pageState.selectedEntity && (
+        <DeleteResourceModal
+          title={`Delete redirect ${truncate(pageState.selectedEntity?.name, {
+            length: 20,
+          })}`}
+          description={`Are you sure you want to delete the redirect ${pageState.selectedEntity?.name}? This redirection and all its destinations will be permanently removed
+      from our servers forever. This action cannot be undone.`}
+          isOpen={pageState.deleteModalIsOpen}
+          onDelete={async () => {
+            console.debug("Deleting entity", pageState!.selectedEntity!.name);
+            await service
+              .delete(pageState.selectedEntity?.id as string)
+              .then(() => {
+                mutate();
+                setPageState((oldState) => ({
+                  ...oldState,
+                  deleteModalIsOpen: false,
+                  selectedEntity: undefined,
+                }));
+              })
+              .catch((err) => {
+                toast(err?.message, {
+                  type: "error",
+                });
+              });
+          }}
+          onCancel={() => {
+            setDeleteModalIsOpen(false);
+          }}
+          setOpen={setDeleteModalIsOpen}
+        />
+      )}
     </div>
   );
 };

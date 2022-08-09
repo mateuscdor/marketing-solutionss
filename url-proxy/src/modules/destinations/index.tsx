@@ -11,13 +11,14 @@ import { useRouter } from "next/router";
 import { useAuthStore } from "../../shared/state";
 import { omit } from "lodash";
 import truncate from "lodash/truncate";
-import { resumeLongText } from "../../utils";
+import DeleteResourceModal from "../../components/modals/delete-resource";
 
 const service = new DestinationsService();
 
 export type PageState = {
   selectedEntity?: Destination;
   modalIsOpen: boolean;
+  deleteModalIsOpen: boolean;
 };
 export type DestinationsHomeProps = {
   redirectId: string;
@@ -53,12 +54,20 @@ const DestinationsHome: NextPage<DestinationsHomeProps> = ({
   const [pageState, setPageState] = useState<PageState>({
     selectedEntity: undefined,
     modalIsOpen: false,
+    deleteModalIsOpen: false,
   });
 
   const setModalIsOpen = useCallback((modalIsOpen: boolean) => {
     setPageState((oldState) => ({
       ...oldState,
       modalIsOpen,
+    }));
+  }, []);
+
+  const setDeleteModalIsOpen = useCallback((isOpen: boolean) => {
+    setPageState((oldState) => ({
+      ...oldState,
+      deleteModalIsOpen: isOpen,
     }));
   }, []);
 
@@ -155,23 +164,13 @@ const DestinationsHome: NextPage<DestinationsHomeProps> = ({
           {
             label: "Delete",
             onClick: async ({ item, index }) => {
-              console.debug("Deleting entity", index);
+              console.debug("Opening delete entity modal", index);
 
-              await service
-                .delete(item.id)
-                .then(() => {
-                  mutate();
-                  setPageState((oldState) => ({
-                    ...oldState,
-                    modalIsOpen: false,
-                    selectedEntity: undefined,
-                  }));
-                })
-                .catch((err) => {
-                  toast(err?.message, {
-                    type: "error",
-                  });
-                });
+              setPageState((oldState) => ({
+                ...oldState,
+                selectedEntity: item,
+                deleteModalIsOpen: true,
+              }));
             },
           },
         ]}
@@ -216,6 +215,41 @@ const DestinationsHome: NextPage<DestinationsHomeProps> = ({
             });
         }}
       />
+      {pageState.selectedEntity && (
+        <DeleteResourceModal
+          title={`Delete destination ${truncate(
+            pageState.selectedEntity?.name,
+            {
+              length: 20,
+            }
+          )}`}
+          description={`Are you sure you want to delete the destination ${pageState.selectedEntity?.name}? This destination will be permanently removed
+      from our servers forever. This action cannot be undone.`}
+          isOpen={pageState.deleteModalIsOpen}
+          onDelete={async () => {
+            console.debug("Deleting entity", pageState!.selectedEntity!.name);
+            await service
+              .delete(pageState!.selectedEntity!.id as string)
+              .then(() => {
+                mutate();
+                setPageState((oldState) => ({
+                  ...oldState,
+                  deleteModalIsOpen: false,
+                  selectedEntity: undefined,
+                }));
+              })
+              .catch((err) => {
+                toast(err?.message, {
+                  type: "error",
+                });
+              });
+          }}
+          onCancel={() => {
+            setDeleteModalIsOpen(false);
+          }}
+          setOpen={setDeleteModalIsOpen}
+        />
+      )}
     </div>
   );
 };
