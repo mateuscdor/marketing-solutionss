@@ -50,11 +50,13 @@ export class RedirectionService {
     }
 
     if (!destination) {
-      destination = await DestinationModel.findOne(
+      destination = await DestinationModel.findOneAndUpdate(
         {
           redirect: redirect.id,
         },
-        null,
+        {
+          $inc: { clicks: 1 },
+        },
         {
           sort: {
             clicks: -1,
