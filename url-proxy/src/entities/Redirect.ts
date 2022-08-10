@@ -7,4 +7,6 @@ export type Redirect = {
   strategy: string;
   maxClicksPerDestination?: number;
   owner: string;
+  createdAt?: string;
+  updatedAt?: string;
 };

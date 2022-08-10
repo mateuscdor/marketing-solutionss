@@ -5,4 +5,6 @@ export type Destination = {
   redirect?: any;
   clicks?: number;
   owner: string;
+  createdAt?: string;
+  updatedAt?: string;
 };

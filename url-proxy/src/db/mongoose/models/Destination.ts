@@ -7,19 +7,29 @@ export interface IDestinationSchema {
   clicks?: number;
   owner: string;
   name: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
-export const DestinationSchema = new mongoose.Schema<IDestinationSchema>({
-  _id: { type: mongoose.Types.ObjectId, auto: true },
-  url: String,
-  clicks: { type: Number, default: 0 },
-  redirect: {
-    type: mongoose.Types.ObjectId,
-    ref: "Redirection",
+export const DestinationSchema = new mongoose.Schema<IDestinationSchema>(
+  {
+    _id: { type: mongoose.Types.ObjectId, auto: true },
+    url: String,
+    clicks: { type: Number, default: 0 },
+    redirect: {
+      type: mongoose.Types.ObjectId,
+      ref: "Redirection",
+    },
+    owner: String,
+    name: String,
   },
-  owner: String,
-  name: String,
-});
+  {
+    timestamps: {
+      createdAt: "createdAt",
+      updatedAt: "updatedAt",
+    },
+  }
+);
 
 export const DestinationModel = (mongoose.models.Destination ||
   mongoose.model(

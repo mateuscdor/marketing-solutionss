@@ -7,20 +7,30 @@ export interface IRedirectionSchema {
   maxClicksPerDestination?: number;
   owner: string;
   name: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
-export const RedirectionSchema = new mongoose.Schema<IRedirectionSchema>({
-  _id: { type: mongoose.Types.ObjectId, auto: true },
-  destinations: [
-    {
-      type: mongoose.Types.ObjectId,
-      ref: "Destination",
+export const RedirectionSchema = new mongoose.Schema<IRedirectionSchema>(
+  {
+    _id: { type: mongoose.Types.ObjectId, auto: true },
+    destinations: [
+      {
+        type: mongoose.Types.ObjectId,
+        ref: "Destination",
+      },
+    ],
+    strategy: String,
+    maxClicksPerDestination: { type: Number, required: false },
+    owner: String,
+    name: String,
+  },
+  {
+    timestamps: {
+      createdAt: "createdAt",
+      updatedAt: "updatedAt",
     },
-  ],
-  strategy: String,
-  maxClicksPerDestination: { type: Number, required: false },
-  owner: String,
-  name: String,
-});
+  }
+);
 
 export const RedirectionModel = (mongoose.models.Redirection ||
   mongoose.model<IRedirectionSchema>(
