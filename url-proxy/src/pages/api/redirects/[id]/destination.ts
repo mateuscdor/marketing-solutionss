@@ -1,10 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import { withSentry } from "@sentry/nextjs";
 import { RedirectionService } from "../../../../services/backend/redirection";
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const {
     method,
     query: { id, userIp },
@@ -32,4 +30,6 @@ export default async function handler(
       res.setHeader("Allow", ["GET"]);
       res.status(405).end(`Method ${method} Not Allowed`);
   }
-}
+};
+
+export default withSentry(handler);

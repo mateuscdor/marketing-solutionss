@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import { withSentry } from "@sentry/nextjs";
 import { Destination } from "../../../entities/Destination";
 import dbConnect from "../../../services/mongoose";
 import {
@@ -7,10 +8,7 @@ import {
 } from "../../../db/mongoose/models";
 import { MongoId } from "../../../db/mongoose/utils";
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { body, method, query } = req;
   await dbConnect();
 
@@ -86,4 +84,6 @@ export default async function handler(
       res.setHeader("Allow", ["GET", "POST"]);
       res.status(405).end(`Method ${method} Not Allowed`);
   }
-}
+};
+
+export default withSentry(handler);
