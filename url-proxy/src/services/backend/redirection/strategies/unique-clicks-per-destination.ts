@@ -22,6 +22,14 @@ export class UniqueClicksPerDestinationStrategy
     };
 
     if (cachedUser) {
+      const { destination: cachedDestination } = JSON.parse(cachedUser);
+
+      console.log({
+        cachedDestination,
+        cachedUser,
+      });
+      if (cachedDestination) return cachedDestination;
+
       const destination = await DestinationModel.findOne(filters, null, {
         sort: {
           clicks: -1,
@@ -47,13 +55,10 @@ export class UniqueClicksPerDestinationStrategy
     ).lean();
 
     const ONE_WEEK_IN_SECONDS = 604800;
-    await redisClient.set(
-      userCacheKey,
-      JSON.stringify({ ip }),
-      "EX",
-      ONE_WEEK_IN_SECONDS
-    );
+    const cacheValue = JSON.stringify({ ip, destination });
+    await redisClient.set(userCacheKey, cacheValue, "EX", ONE_WEEK_IN_SECONDS);
 
+    console.debug(`==> caching value at key ${userCacheKey}`, cacheValue);
     return destination;
   }
 }
