@@ -1,5 +1,6 @@
 import { Destination } from "../entities/Destination";
 import { Redirect } from "../entities/Redirect";
+import { GetDestinationMetadata } from "./backend/redirection";
 import { api } from "./base";
 
 export type GetManyRedirects = {
@@ -35,7 +36,7 @@ export class RedirectsService {
 
   async getDestination(
     redirectId: string,
-    userData: any
+    userData: GetDestinationMetadata
   ): Promise<Destination> {
     return await api
       .get(`${this.path}/${redirectId}/destination`, {
@@ -44,5 +45,14 @@ export class RedirectsService {
         },
       })
       .then(({ data }) => data.destination);
+  }
+
+  getShareUrl(redirectId: string): string {
+    const origin =
+      typeof window !== "undefined" && window.location.origin
+        ? window.location.origin
+        : "";
+
+    return `${origin}/go?origin=${redirectId}`;
   }
 }

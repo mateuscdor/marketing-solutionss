@@ -1,22 +1,27 @@
 import { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import FullscreenLoading from "../components/loading/fullscreen";
 import { RedirectsService } from "../services/redirects";
 
 function GoPage({ origin, userIp }: any) {
   const router = useRouter();
+  const alreadyCalledRef = useRef(false);
 
   useEffect(() => {
+    if (alreadyCalledRef.current) return;
+    console.debug(`==> requesting destination ${origin} - ${userIp}`);
     new RedirectsService()
       .getDestination(origin, {
-        userIp,
+        ip: userIp,
       })
       .then((destination) => {
         if (destination) {
           router.push(destination.url);
         }
       });
+
+    alreadyCalledRef.current = true;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return <FullscreenLoading />;

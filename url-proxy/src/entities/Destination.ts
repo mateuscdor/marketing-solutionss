@@ -4,5 +4,8 @@ export type Destination = {
   url: string;
   redirect?: any;
   clicks?: number;
+  order?: number;
   owner: string;
+  createdAt?: string;
+  updatedAt?: string;
 };

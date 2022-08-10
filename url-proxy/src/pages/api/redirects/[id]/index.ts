@@ -1,6 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { DestinationModel } from "../../../../db/mongoose/models/Destination";
-import { RedirectionModel } from "../../../../db/mongoose/models/Redirection";
+import {
+  RedirectionModel,
+  DestinationModel,
+} from "../../../../db/mongoose/models";
 import { MongoId } from "../../../../db/mongoose/utils";
 
 export default async function userHandler(

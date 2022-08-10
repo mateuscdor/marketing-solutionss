@@ -1,8 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import omit from "lodash/omit";
-import { DestinationModel } from "../../../../db/mongoose/models/Destination";
+import {
+  DestinationModel,
+  RedirectionModel,
+} from "../../../../db/mongoose/models";
 import { MongoId } from "../../../../db/mongoose/utils";
-import { RedirectionModel } from "../../../../db/mongoose/models/Redirection";
 
 export default async function userHandler(
   req: NextApiRequest,

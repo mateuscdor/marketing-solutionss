@@ -1,19 +1,24 @@
 import React from "react";
 
 export type ManageHeaderProps = {
-  title: string;
+  title?: string;
+  titleComponent?: React.ReactNode;
   description?: string;
   onCreateClick?: (item: any) => void;
 };
 const ManageHeader = ({
   onCreateClick,
   title,
+  titleComponent = null,
   description,
 }: ManageHeaderProps) => {
   return (
     <div className="sm:flex sm:items-center">
       <div className="sm:flex-auto">
-        <h1 className="text-xl font-semibold text-gray-900">{title}</h1>
+        {title && (
+          <h1 className="text-xl font-semibold text-gray-900">{title}</h1>
+        )}
+        {titleComponent}
         {description && (
           <p className="mt-2 text-sm text-gray-700">{description}</p>
         )}

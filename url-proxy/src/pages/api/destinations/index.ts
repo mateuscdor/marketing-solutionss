@@ -4,7 +4,7 @@ import dbConnect from "../../../services/mongoose";
 import {
   DestinationModel,
   IDestinationSchema,
-} from "../../../db/mongoose/models/Destination";
+} from "../../../db/mongoose/models";
 import { MongoId } from "../../../db/mongoose/utils";
 
 export default async function handler(
@@ -16,10 +16,18 @@ export default async function handler(
 
   switch (method) {
     case "GET":
-      const destinations = await DestinationModel.find({
-        owner: query.owner,
-        redirect: query.redirectId,
-      })
+      const destinations = await DestinationModel.find(
+        {
+          owner: query.owner,
+          redirect: query.redirectId,
+        },
+        null,
+        {
+          sort: {
+            order: 1,
+          },
+        }
+      )
         .populate("redirect")
         .lean();
 
@@ -45,8 +53,31 @@ export default async function handler(
         redirect: MongoId.stringToObjectId(redirect),
       };
 
+      const lastDestination = await DestinationModel.findOne(
+        {
+          redirect,
+        },
+        null,
+        {
+          sort: {
+            order: -1,
+          },
+        }
+      ).lean();
+
+      const order = (lastDestination?.order || 0) + 1;
+
+      const createData = {
+        ...data,
+        order,
+      };
+      console.log({
+        lastDestination,
+        order,
+        createData,
+      });
       const createdDestinationModel = await (
-        await DestinationModel.create(data)
+        await DestinationModel.create(createData)
       ).toJSON();
 
       res.status(200).json(MongoId.toId(createdDestinationModel));
