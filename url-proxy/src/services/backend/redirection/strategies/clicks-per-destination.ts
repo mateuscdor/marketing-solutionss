@@ -23,10 +23,13 @@ export class ClicksPerDestinationStrategy implements IDestinationStrategy {
       {
         sort: {
           clicks: -1,
+          order: 1,
         },
         new: true,
       }
     ).lean();
+
+    console.debug(filters, destination);
 
     return destination;
   }

@@ -25,6 +25,7 @@ export class UniqueClicksPerDestinationStrategy
       const destination = await DestinationModel.findOne(filters, null, {
         sort: {
           clicks: -1,
+          order: 1,
         },
         new: true,
       }).lean();
@@ -39,6 +40,7 @@ export class UniqueClicksPerDestinationStrategy
       {
         sort: {
           clicks: -1,
+          order: 1,
         },
         new: true,
       }

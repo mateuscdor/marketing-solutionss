@@ -5,6 +5,7 @@ export interface IDestinationSchema {
   url: string;
   redirect?: mongoose.Types.ObjectId | any;
   clicks?: number;
+  order?: number;
   owner: string;
   name: string;
   createdAt?: string;
@@ -22,6 +23,7 @@ export const DestinationSchema = new mongoose.Schema<IDestinationSchema>(
     },
     owner: String,
     name: String,
+    order: { type: Number, default: 0 },
   },
   {
     timestamps: {

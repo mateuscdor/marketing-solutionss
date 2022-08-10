@@ -49,18 +49,21 @@ export class RedirectionService {
       });
     }
 
-    destination = await DestinationModel.findOne(
-      {
-        redirect: redirect.id,
-      },
-      null,
-      {
-        sort: {
-          clicks: -1,
+    if (!destination) {
+      destination = await DestinationModel.findOne(
+        {
+          redirect: redirect.id,
         },
-        new: true,
-      }
-    ).lean();
+        null,
+        {
+          sort: {
+            clicks: -1,
+            order: -1,
+          },
+          new: true,
+        }
+      ).lean();
+    }
 
     return destination;
   }

@@ -5,11 +5,9 @@ import dbConnect from "../../../services/mongoose";
 import {
   RedirectionModel,
   IRedirectionSchema,
-} from "../../../db/mongoose/models/Redirection";
-import {
   DestinationModel,
   IDestinationSchema,
-} from "../../../db/mongoose/models/Destination";
+} from "../../../db/mongoose/models";
 import { MongoId } from "../../../db/mongoose/utils";
 
 export default async function handler(
@@ -45,10 +43,11 @@ export default async function handler(
       const createdDestinations = await DestinationModel.create<
         IDestinationSchema[]
       >(
-        destinations.map((destination: any) => ({
+        destinations.map((destination: any, order: number) => ({
           ...destination,
           redirect: _id,
           owner,
+          order,
         }))
       );
 
