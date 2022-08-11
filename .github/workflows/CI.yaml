@@ -1,10 +1,13 @@
-name: CI
+name: url-proxy
 
 on: [push]
 
 jobs:
   CI:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./url-proxy
     strategy:
       matrix:
         node-version: [14.x, 16.x, 18.x]
