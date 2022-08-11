@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "cypress": "cypress open",
+    "cypress:ci": "cypress run --reporter json --reporter-options output=result.json",
+    "test:e2e": "start-server-and-test start http://localhost:3000 cypress:ci"
   },
   "dependencies": {
     "@aws-amplify/cli": "^9.2.1",
@@ -37,9 +40,12 @@
     "@types/react": "18.0.15",
     "@types/react-dom": "18.0.6",
     "autoprefixer": "^10.4.8",
+    "cypress": "^10.4.0",
+    "dotenv": "^16.0.1",
     "eslint": "8.21.0",
     "eslint-config-next": "12.2.3",
     "postcss": "^8.4.14",
+    "start-server-and-test": "^1.14.0",
     "tailwindcss": "^3.1.7",
     "typescript": "4.7.4"
   }

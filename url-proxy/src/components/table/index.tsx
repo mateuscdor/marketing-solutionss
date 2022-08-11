@@ -24,7 +24,7 @@ export type TableProps = {
 const Table = ({ columns, data, actions, isLoading }: TableProps) => {
   return (
     <div className="-mx-4 mt-8 overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:-mx-6 md:mx-0 md:rounded-lg">
-      <table className="relative flex flex-col w-full bg-yello-400 table-fixed divide-y divide-gray-300">
+      <table className="Table relative flex flex-col w-full bg-yello-400 table-fixed divide-y divide-gray-300">
         <thead className="bg-gray-50 w-full">
           <tr className="w-full flex flex-row justify-between">
             {columns.map((column) => (
@@ -44,10 +44,14 @@ const Table = ({ columns, data, actions, isLoading }: TableProps) => {
             </th>
           </tr>
         </thead>
-        <tbody className="flex flex-col  w-full divide-y divide-gray-200 px-4">
+        <tbody className="TableBody flex flex-col  w-full divide-y divide-gray-200 px-4">
           {data.map((item, itemIndex) => {
             return (
-              <tr key={item.id} className="flex flex-row items-center w-auto ">
+              <tr
+                key={item.id}
+                id={`TableBodyRow-${item.id}`}
+                className="TableBodyRow flex flex-row items-center w-auto "
+              >
                 {columns.map((column) => (
                   <td
                     key={`column-${item.id}-${column.key}`}
