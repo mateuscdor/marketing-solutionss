@@ -8,17 +8,21 @@ axiosRetry(api, { retries: 3 });
 
 export type GetManyRedirects = {
   owner?: string;
+  limit?: number;
+  skip?: number;
 };
 
 export class RedirectsService {
   path = "/redirects";
 
-  async getMany({ owner }: GetManyRedirects): Promise<{
+  async getMany({ owner, limit, skip }: GetManyRedirects): Promise<{
     results: Redirect[];
   }> {
     const { data } = await api.get(this.path, {
       params: {
         owner,
+        limit,
+        skip,
       },
     });
 

@@ -31,6 +31,8 @@ const RedirectsHome = () => {
     () => {
       return service.getMany({
         owner: authStore.user?.id,
+        limit: 10000,
+        skip: 0,
       });
     },
     {

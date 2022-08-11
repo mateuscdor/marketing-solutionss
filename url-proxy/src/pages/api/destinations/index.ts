@@ -14,22 +14,28 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   switch (method) {
     case "GET":
-      const destinations = await DestinationModel.find(
-        {
-          owner: query.owner,
-          redirect: query.redirectId,
+      const limit = Number(query.limit || 10);
+      const skip = Number(query.skip || 0);
+      const filters = {
+        owner: query.owner,
+        redirect: query.redirectId,
+      };
+      const destinations = await DestinationModel.find(filters, null, {
+        sort: {
+          order: 1,
         },
-        null,
-        {
-          sort: {
-            order: 1,
-          },
-        }
-      )
+        limit,
+        skip,
+      })
         .populate("redirect")
         .lean();
-
+      const total = await DestinationModel.countDocuments(filters);
       res.status(200).json({
+        pagination: {
+          limit,
+          skip,
+          total,
+        },
         results: destinations.map((destination) => {
           const destinationWithId =
             MongoId.toId<IDestinationSchema>(destination);

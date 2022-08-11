@@ -45,6 +45,8 @@ const DestinationsHome: NextPage<DestinationsHomeProps> = ({
       return service.getMany({
         redirectId,
         owner: authStore.user?.id,
+        limit: 10000,
+        skip: 0,
       });
     },
     {
