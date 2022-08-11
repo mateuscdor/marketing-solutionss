@@ -1,6 +1,10 @@
 name: url-proxy
 
-on: [push]
+on:
+  push:
+    branches:
+      - "develop"
+      - "master"
 
 jobs:
   CI:
