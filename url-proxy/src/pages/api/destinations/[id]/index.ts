@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import { withSentry } from "@sentry/nextjs";
 import omit from "lodash/omit";
 import {
   DestinationModel,
@@ -6,10 +7,7 @@ import {
 } from "../../../../db/mongoose/models";
 import { MongoId } from "../../../../db/mongoose/utils";
 
-export default async function userHandler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const {
     query: { id },
     body,
@@ -72,4 +70,6 @@ export default async function userHandler(
       res.setHeader("Allow", ["GET", "PUT", "DELETE"]);
       res.status(405).end(`Method ${method} Not Allowed`);
   }
-}
+};
+
+export default withSentry(handler);
