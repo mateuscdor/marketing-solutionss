@@ -9,7 +9,7 @@ const Action = ({ label, onClick }: ActionProps) => {
     <button
       type="button"
       onClick={onClick}
-      className="text-indigo-600 hover:text-indigo-900"
+      className="TableAction text-indigo-600 hover:text-indigo-900"
     >
       {label}
     </button>

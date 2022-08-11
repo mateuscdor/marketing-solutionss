@@ -58,3 +58,6 @@ amplifytools.xcconfig
 
 # Sentry
 .sentryclirc
+
+
+**/*.mp4
