@@ -1,10 +1,26 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { withSentry } from "@sentry/nextjs";
 import format from "date-fns/format";
+import parse from "date-fns/parse";
+
 import dbConnect from "../../../../services/mongoose";
 import { ClickModel, IClickSchema } from "../../../../db/mongoose/models";
 import { identity, pickBy } from "lodash";
 
+export type GraphicDataGroupTimeValue = {
+  [moment: string]: {
+    [destinationName: string]: number;
+  };
+};
+export type GraphicDataGroupValue = {
+  day: GraphicDataGroupTimeValue;
+  day_hour: GraphicDataGroupTimeValue;
+  day_hour_minute: GraphicDataGroupTimeValue;
+};
+export type GraphicData = {
+  by_destination_name: GraphicDataGroupValue;
+  by_click_type: GraphicDataGroupValue;
+};
 const getGraphicData = (clicks: IClickSchema[]) => {
   const timeGroupKeys = [
     {
@@ -21,6 +37,16 @@ const getGraphicData = (clicks: IClickSchema[]) => {
     },
   ];
 
+  const timeGroupKeysGrouppedByKey = timeGroupKeys.reduce(
+    (acc, { timeGroupKeyName, timeGroupKeyValue }) => {
+      return {
+        ...acc,
+        [timeGroupKeyName]: timeGroupKeyValue,
+      };
+    },
+    {}
+  ) as any;
+
   const subGroupKeys = [
     {
       subGroupKeyName: "by_destination_name",
@@ -32,7 +58,7 @@ const getGraphicData = (clicks: IClickSchema[]) => {
       subGroupValueExtractor: (click: IClickSchema) => click?.type,
     },
   ];
-  return clicks.reduce((acc, click) => {
+  const graphicData = clicks.reduce((acc, click) => {
     const newAcc: any = {
       ...acc,
     };
@@ -90,7 +116,56 @@ const getGraphicData = (clicks: IClickSchema[]) => {
     });
 
     return newAcc;
-  }, {});
+  }, {}) as GraphicData;
+
+  const preparedGraphicData = Object.entries(graphicData).reduce(
+    (acc, [subGroupKeyName, subGroupKeyValue]) => {
+      const newSubGroupVaue = Object.entries(subGroupKeyValue).reduce(
+        (acc2, [timeGroupKeyName, timeGroupKeyValue]) => {
+          const newTimeGroupValue = Object.entries(timeGroupKeyValue)
+            .sort(([keyA], [keyB]) => {
+              const timeTemplate = timeGroupKeysGrouppedByKey[timeGroupKeyName];
+              return (
+                parse(keyA, timeTemplate, new Date()).getTime() -
+                parse(keyB, timeTemplate, new Date()).getTime()
+              );
+            })
+            .map(([keyName, keyValue]) => {
+              const newValue = {
+                name: keyName,
+                ...keyValue,
+              };
+
+              return newValue;
+            });
+
+          const newAcc2 = {
+            ...acc2,
+            [timeGroupKeyName]: newTimeGroupValue,
+          };
+          console.log(`[${subGroupKeyName}][${timeGroupKeyName}]==> 1`, {
+            newTimeGroupValue,
+            acc2,
+            newAcc2,
+          });
+          return newAcc2;
+        },
+        {}
+      );
+
+      const newAcc = {
+        ...acc,
+        [subGroupKeyName]: newSubGroupVaue,
+      };
+
+      return newAcc;
+    },
+    {}
+  );
+  return {
+    graphicData,
+    preparedGraphicData,
+  };
 };
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { method, query } = req;
@@ -111,8 +186,18 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         .populate("destination")
         .lean();
 
+      const destinationNames = Array.from(
+        new Set(
+          clicks.map(({ destination }) => destination?.name).filter(identity)
+        )
+      );
       const graphicData = await getGraphicData(clicks);
-      res.status(200).json({ graphicData });
+      res
+        .status(200)
+        .json({
+          graphicData: graphicData.preparedGraphicData,
+          destinationNames,
+        });
       break;
     default:
       res.setHeader("Allow", ["GET"]);
