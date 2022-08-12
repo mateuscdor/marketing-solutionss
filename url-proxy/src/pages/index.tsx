@@ -1,9 +1,9 @@
-import RedirectsHome from "../modules/redirects/home";
 import DashboardLayout from "../layouts/dashboard";
+import Dashboard from "../modules/dashboard";
 
 const Page = (props: any) => (
   <DashboardLayout>
-    <RedirectsHome {...props} />
+    <Dashboard {...props} />
   </DashboardLayout>
 );
 
