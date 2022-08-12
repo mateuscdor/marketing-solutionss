@@ -9,6 +9,7 @@ export type TablePropsColumn = {
 
 import truncate from "lodash/truncate";
 import Loading from "../loading";
+import PaginationFooter, { PaginationFooterProps } from "./pagination-footer";
 
 export type CustomAction = React.ReactNode;
 
@@ -20,8 +21,15 @@ export type TableProps = {
   actions: TableAction[];
   data: any[];
   isLoading?: boolean;
+  paginationsProps?: Omit<PaginationFooterProps, "results">;
 };
-const Table = ({ columns, data, actions, isLoading }: TableProps) => {
+const Table = ({
+  columns,
+  data,
+  actions,
+  isLoading,
+  paginationsProps,
+}: TableProps) => {
   return (
     <div className="-mx-4 mt-8 overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:-mx-6 md:mx-0 md:rounded-lg">
       <table className="Table relative flex flex-col w-full bg-yello-400 table-fixed divide-y divide-gray-300">
@@ -90,6 +98,9 @@ const Table = ({ columns, data, actions, isLoading }: TableProps) => {
           </div>
         )}
       </table>
+      {!!paginationsProps && (
+        <PaginationFooter {...paginationsProps} results={data.length} />
+      )}
     </div>
   );
 };
