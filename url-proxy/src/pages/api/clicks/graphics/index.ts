@@ -3,6 +3,7 @@ import { withSentry } from "@sentry/nextjs";
 import format from "date-fns/format";
 import dbConnect from "../../../../services/mongoose";
 import { ClickModel, IClickSchema } from "../../../../db/mongoose/models";
+import { identity, pickBy } from "lodash";
 
 const getGraphicData = (clicks: IClickSchema[]) => {
   const timeGroupKeys = [
@@ -57,25 +58,12 @@ const getGraphicData = (clicks: IClickSchema[]) => {
               newAcc[subGroupKeyName][timeGroupKeyName][formattedTime][
                 subGroupValue
               ] + click.value;
-
-            console.log(
-              `[${timeGroupKeyName}][${subGroupKeyName}][${formattedTime}] Existent ${newAcc[subGroupKeyName][timeGroupKeyName][formattedTime][subGroupValue]} + ${click.value}`
-            );
           } else {
             newAcc[subGroupKeyName][timeGroupKeyName][formattedTime][
               subGroupValue
             ] = click.value;
-
-            console.log(
-              `[${timeGroupKeyName}][${subGroupKeyName}][${formattedTime}] New Subgroup + ${click.value}`,
-              newAcc
-            );
           }
         } else {
-          console.log(
-            `[${timeGroupKeyName}][${subGroupKeyName}][${formattedTime}] New + ${click.value}`,
-            newAcc
-          );
           if (!newAcc[subGroupKeyName]) {
             newAcc[subGroupKeyName] = {
               [timeGroupKeyName]: {
@@ -110,9 +98,16 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   switch (method) {
     case "GET":
-      const clicks = await ClickModel.find({
-        owner: query.owner,
-      })
+      const filters = pickBy(
+        {
+          owner: query.owner,
+          redirect: query.redirect,
+          destination: query.destination,
+        },
+        identity
+      );
+
+      const clicks = await ClickModel.find(filters)
         .populate("destination")
         .lean();
 
