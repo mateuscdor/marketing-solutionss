@@ -10,6 +10,8 @@ import { useRouter } from "next/router";
 import { useAuthStore } from "../../shared/state";
 import { omit, truncate } from "lodash";
 import DeleteResourceModal from "../../components/modals/delete-resource";
+import usePersistentState from "../../shared/hooks/usePersistentState";
+import { PaginationFilters } from "../../shared/types";
 
 const service = new RedirectsService();
 
@@ -21,16 +23,24 @@ export type PageState = {
 const RedirectsHome = () => {
   const router = useRouter();
   const authStore = useAuthStore();
+  const [paginationFilters, setPaginationFilters] =
+    usePersistentState<PaginationFilters>("RedirectsHomePaginationFilters", {
+      defaultValue: {
+        limit: 10,
+        skip: 0,
+      },
+    });
 
   const {
     data: entitiesResponse,
     mutate,
     isValidating,
   } = useSWR(
-    ["/api/redirects"],
+    ["/api/redirects", paginationFilters],
     () => {
       return service.getMany({
         owner: authStore.user?.id,
+        ...paginationFilters,
       });
     },
     {
@@ -78,6 +88,27 @@ const RedirectsHome = () => {
       />
       <Table
         isLoading={isValidating}
+        paginationsProps={
+          paginationFilters && {
+            ...paginationFilters,
+            total: entitiesResponse?.pagination?.total || 0,
+            onNextClick: ({ newSkip }) => {
+              console.debug({ newSkip });
+              setPaginationFilters((oldState) => ({
+                ...oldState,
+                skip: newSkip,
+              }));
+            },
+            onPreviousClick: ({ newSkip }) => {
+              console.debug({ newSkip });
+              setPaginationFilters((oldState) => ({
+                ...oldState,
+                skip: newSkip,
+              }));
+            },
+            ...paginationFilters,
+          }
+        }
         columns={[
           {
             key: "name",

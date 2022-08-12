@@ -1,20 +1,28 @@
 import { Destination } from "../entities/Destination";
+import { ListManyResponse } from "../shared/types";
 import { api } from "./base";
 
 export type GetManyDestinations = {
   redirectId: string;
   owner?: string;
+  limit?: number;
+  skip?: number;
 };
 export class DestinationsService {
   path = "/destinations";
 
-  async getMany({ redirectId, owner }: GetManyDestinations): Promise<{
-    results: Destination[];
-  }> {
+  async getMany({
+    redirectId,
+    owner,
+    limit,
+    skip,
+  }: GetManyDestinations): Promise<ListManyResponse<Destination>> {
     const { data } = await api.get(this.path, {
       params: {
         redirectId,
         owner,
+        limit,
+        skip,
       },
     });
 

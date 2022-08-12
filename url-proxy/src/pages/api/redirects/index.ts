@@ -17,13 +17,31 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   switch (method) {
     case "GET":
-      const redirects = await RedirectionModel.find({
+      const limit = Number(query.limit || 10);
+      const skip = Number(query.skip || 0);
+
+      const filters = {
         owner: query.owner,
+      };
+      const redirects = await RedirectionModel.find(filters, null, {
+        limit,
+        skip,
       })
         .populate("destinations")
         .lean();
 
+      const total = await RedirectionModel.countDocuments(filters);
+
+      console.debug({
+        redirects,
+        total,
+      });
       res.status(200).json({
+        pagination: {
+          limit,
+          skip,
+          total,
+        },
         results: redirects.map((redirect) => {
           const redirectWithId = MongoId.toId<IRedirectionSchema>(redirect);
 
