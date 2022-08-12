@@ -7,12 +7,16 @@ import { ClickModel, IClickSchema } from "../../../../db/mongoose/models";
 const getGraphicData = (clicks: IClickSchema[]) => {
   const timeGroupKeys = [
     {
-      timeGroupKeyName: "day_hour",
-      timeGroupKeyValue: "MM-dd HH",
-    },
-    {
       timeGroupKeyName: "day",
       timeGroupKeyValue: "MM-dd",
+    },
+    {
+      timeGroupKeyName: "day_hour",
+      timeGroupKeyValue: "MM-dd HH'h'",
+    },
+    {
+      timeGroupKeyName: "day_hour_minute",
+      timeGroupKeyValue: "MM-dd HH'h' m'm'",
     },
   ];
 
@@ -41,25 +45,57 @@ const getGraphicData = (clicks: IClickSchema[]) => {
       subGroupKeys.forEach(({ subGroupKeyName, subGroupValueExtractor }) => {
         const subGroupValue = subGroupValueExtractor(click);
 
-        if (newAcc[subGroupKeyName]?.[formattedTime]) {
-          if (newAcc[subGroupKeyName][formattedTime][subGroupValue]) {
-            newAcc[subGroupKeyName][formattedTime][subGroupValue] =
-              newAcc[subGroupKeyName][formattedTime][subGroupValue] +
-              click.value;
+        if (newAcc[subGroupKeyName]?.[timeGroupKeyName]?.[formattedTime]) {
+          if (
+            newAcc[subGroupKeyName][timeGroupKeyName][formattedTime][
+              subGroupValue
+            ]
+          ) {
+            newAcc[subGroupKeyName][timeGroupKeyName][formattedTime][
+              subGroupValue
+            ] =
+              newAcc[subGroupKeyName][timeGroupKeyName][formattedTime][
+                subGroupValue
+              ] + click.value;
+
+            console.log(
+              `[${timeGroupKeyName}][${subGroupKeyName}][${formattedTime}] Existent ${newAcc[subGroupKeyName][timeGroupKeyName][formattedTime][subGroupValue]} + ${click.value}`
+            );
           } else {
-            newAcc[subGroupKeyName][formattedTime][subGroupValue] = click.value;
+            newAcc[subGroupKeyName][timeGroupKeyName][formattedTime][
+              subGroupValue
+            ] = click.value;
+
+            console.log(
+              `[${timeGroupKeyName}][${subGroupKeyName}][${formattedTime}] New Subgroup + ${click.value}`,
+              newAcc
+            );
           }
         } else {
+          console.log(
+            `[${timeGroupKeyName}][${subGroupKeyName}][${formattedTime}] New + ${click.value}`,
+            newAcc
+          );
           if (!newAcc[subGroupKeyName]) {
             newAcc[subGroupKeyName] = {
-              [formattedTime]: {
-                [subGroupValue]: click.value,
+              [timeGroupKeyName]: {
+                [formattedTime]: {
+                  [subGroupValue]: click.value,
+                },
               },
             };
           } else {
-            newAcc[subGroupKeyName][formattedTime] = {
-              [subGroupValue]: click.value,
-            };
+            if (!newAcc[subGroupKeyName][timeGroupKeyName]) {
+              newAcc[subGroupKeyName][timeGroupKeyName] = {
+                [formattedTime]: {
+                  [subGroupValue]: click.value,
+                },
+              };
+            } else {
+              newAcc[subGroupKeyName][timeGroupKeyName][formattedTime] = {
+                [subGroupValue]: click.value,
+              };
+            }
           }
         }
       });
@@ -77,11 +113,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       const clicks = await ClickModel.find({
         owner: query.owner,
       })
-        .lean()
-        .populate("destination");
+        .populate("destination")
+        .lean();
 
       const graphicData = await getGraphicData(clicks);
-      res.status(200).json({ graphicData, clicks });
+      res.status(200).json({ graphicData });
       break;
     default:
       res.setHeader("Allow", ["GET"]);
