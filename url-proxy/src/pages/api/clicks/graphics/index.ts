@@ -5,26 +5,26 @@ import dbConnect from "../../../../services/mongoose";
 import { ClickModel, IClickSchema } from "../../../../db/mongoose/models";
 
 const getGraphicData = (clicks: IClickSchema[]) => {
-  const groupKeys = [
+  const timeGroupKeys = [
     {
-      groupKeyName: "day_hour",
-      groupKeyValue: "MM-dd HH",
+      timeGroupKeyName: "day_hour",
+      timeGroupKeyValue: "MM-dd HH",
     },
     {
-      groupKeyName: "day",
-      groupKeyValue: "MM-dd",
+      timeGroupKeyName: "day",
+      timeGroupKeyValue: "MM-dd",
     },
   ];
 
   const subGroupKeys = [
     {
-      subGroupKeyName: "day",
-      subGroupKeyValueExtractor: (click: IClickSchema) =>
+      subGroupKeyName: "by_destination_name",
+      subGroupValueExtractor: (click: IClickSchema) =>
         click?.destination?.name || "deleted",
     },
     {
-      subGroupKeyName: "day 2",
-      subGroupKeyValueExtractor: (click: IClickSchema) => click?.type,
+      subGroupKeyName: "by_click_type",
+      subGroupValueExtractor: (click: IClickSchema) => click?.type,
     },
   ];
   return clicks.reduce((acc, click) => {
@@ -32,26 +32,35 @@ const getGraphicData = (clicks: IClickSchema[]) => {
       ...acc,
     };
 
-    groupKeys.forEach(({ groupKeyName, groupKeyValue }) => {
-      const groupKey = format(
+    timeGroupKeys.forEach(({ timeGroupKeyName, timeGroupKeyValue }) => {
+      const formattedTime = format(
         new Date(click.createdAt as string),
-        groupKeyValue
+        timeGroupKeyValue
       );
 
-      subGroupKeys.forEach(({ subGroupKeyName, subGroupKeyValueExtractor }) => {
-        const subGroupKey = subGroupKeyValueExtractor(click);
+      subGroupKeys.forEach(({ subGroupKeyName, subGroupValueExtractor }) => {
+        const subGroupValue = subGroupValueExtractor(click);
 
-        if (newAcc[groupKey]) {
-          if (newAcc[groupKey][subGroupKey]) {
-            newAcc[groupKey][subGroupKey] =
-              newAcc[groupKey][subGroupKey] + click.value;
+        if (newAcc[subGroupKeyName]?.[formattedTime]) {
+          if (newAcc[subGroupKeyName][formattedTime][subGroupValue]) {
+            newAcc[subGroupKeyName][formattedTime][subGroupValue] =
+              newAcc[subGroupKeyName][formattedTime][subGroupValue] +
+              click.value;
           } else {
-            newAcc[groupKey][subGroupKey] = click.value;
+            newAcc[subGroupKeyName][formattedTime][subGroupValue] = click.value;
           }
         } else {
-          newAcc[groupKey] = {
-            [subGroupKey]: click.value,
-          };
+          if (!newAcc[subGroupKeyName]) {
+            newAcc[subGroupKeyName] = {
+              [formattedTime]: {
+                [subGroupValue]: click.value,
+              },
+            };
+          } else {
+            newAcc[subGroupKeyName][formattedTime] = {
+              [subGroupValue]: click.value,
+            };
+          }
         }
       });
     });
