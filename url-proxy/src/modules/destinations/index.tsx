@@ -137,7 +137,9 @@ const DestinationsHome: NextPage<DestinationsHomeProps> = ({
               className="h-6 w-6 cursor-pointer"
               onClick={() => {
                 console.debug("Sharing redirect", redirectId);
-                const sharedLink = redirectsService.getShareUrl(redirectId);
+                const sharedLink =
+                  (router.query.shortUrl as any) ||
+                  redirectsService.getShareUrl(redirectId);
 
                 toast("Link copied to clipboard", {
                   type: "success",

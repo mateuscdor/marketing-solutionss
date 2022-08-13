@@ -1,4 +1,5 @@
 import { Destination } from "./Destination";
+import { ShortUrl } from "./ShortUrl";
 
 export type Redirect = {
   id?: string;
@@ -7,6 +8,7 @@ export type Redirect = {
   strategy: string;
   maxClicksPerDestination?: number;
   owner: string;
+  shortUrl?: ShortUrl;
   createdAt?: string;
   updatedAt?: string;
 };

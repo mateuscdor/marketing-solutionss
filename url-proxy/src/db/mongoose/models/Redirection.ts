@@ -1,4 +1,5 @@
 import mongoose, { Model } from "mongoose";
+import { IShortUrlSchema, ShortUrlSchema } from "./ShortUrl";
 
 export interface IRedirectionSchema {
   _id: mongoose.Types.ObjectId | any;
@@ -7,6 +8,7 @@ export interface IRedirectionSchema {
   maxClicksPerDestination?: number;
   owner: string;
   name: string;
+  shortUrl?: IShortUrlSchema;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -23,6 +25,7 @@ export const RedirectionSchema = new mongoose.Schema<IRedirectionSchema>(
     maxClicksPerDestination: { type: Number, required: false },
     owner: String,
     name: String,
+    shortUrl: ShortUrlSchema,
   },
   {
     timestamps: {

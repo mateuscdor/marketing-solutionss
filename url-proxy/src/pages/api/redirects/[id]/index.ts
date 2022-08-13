@@ -5,6 +5,9 @@ import {
   DestinationModel,
 } from "../../../../db/mongoose/models";
 import { MongoId } from "../../../../db/mongoose/utils";
+import { ShortUrlService } from "../../../../services/backend/shorturl";
+
+const shortUrlService = new ShortUrlService();
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const {
@@ -36,11 +39,17 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       res.status(200).json({ id });
       break;
     case "DELETE":
+      const redirectToDelete = await RedirectionModel.findById(id).lean();
       const _id = MongoId.stringToObjectId(id as string);
 
       await RedirectionModel.deleteOne({
         _id,
       });
+
+      console.log(redirectToDelete?.shortUrl);
+      if (redirectToDelete?.shortUrl) {
+        await shortUrlService.deleteShortUrl(redirectToDelete?.shortUrl);
+      }
 
       await DestinationModel.deleteMany({
         redirect: _id,
