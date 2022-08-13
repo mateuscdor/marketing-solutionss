@@ -10,6 +10,9 @@ import {
   IDestinationSchema,
 } from "../../../db/mongoose/models";
 import { MongoId } from "../../../db/mongoose/utils";
+import { ShortUrlService } from "../../../services/backend/shorturl";
+
+const shortUrlService = new ShortUrlService();
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { body, method, query } = req;
@@ -32,10 +35,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
       const total = await RedirectionModel.countDocuments(filters);
 
-      console.debug({
-        redirects,
-        total,
-      });
       res.status(200).json({
         pagination: {
           limit,
@@ -67,13 +66,20 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         }))
       );
 
+      const shortUrl = await shortUrlService.getShortUrl(
+        `https://trafego.irbano.com.br/go?origin=${MongoId.objectIdToString(
+          _id
+        )}`
+      );
       const data = {
         ...redirect,
         destinations: createdDestinations.map(({ _id }) => _id),
         _id,
         owner,
+        shortUrl,
       };
 
+      console.log({ data });
       const createdRedirectionModel = await (
         await RedirectionModel.create(data)
       ).toJSON();
