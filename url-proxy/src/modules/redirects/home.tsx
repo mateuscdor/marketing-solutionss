@@ -126,7 +126,8 @@ const RedirectsHome = () => {
             label: "Share",
             onClick: async ({ item, index }) => {
               console.debug("Sharing entity", index);
-              const sharedLink = service.getShareUrl(item.id);
+              const sharedLink =
+                item.shortUrl?.shortUrl || service.getShareUrl(item.id);
 
               toast("Link copied to clipboard", {
                 type: "success",
@@ -155,6 +156,7 @@ const RedirectsHome = () => {
                 pathname: `/redirects/${item.id}/destinations`,
                 query: {
                   redirectSource: item.name,
+                  shortUrl: item.shortUrl?.shortUrl || "",
                 },
               });
             },
