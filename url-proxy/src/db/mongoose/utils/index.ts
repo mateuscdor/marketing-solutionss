@@ -28,4 +28,7 @@ export class MongoId {
   static stringToObjectId(id: string): mongoose.Types.ObjectId {
     return new mongoose.Types.ObjectId(id.toString());
   }
+  static objectIdToString(_id: mongoose.Types.ObjectId): string {
+    return _id.toString();
+  }
 }
