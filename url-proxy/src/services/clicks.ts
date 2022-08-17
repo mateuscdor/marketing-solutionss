@@ -3,7 +3,7 @@ import { api } from "./base";
 
 export type GetClickGraphics = {
   owner?: string;
-  redirect?: number;
+  redirect?: string;
   destination?: number;
 };
 
