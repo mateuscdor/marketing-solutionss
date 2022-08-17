@@ -5,7 +5,7 @@ import { Fragment, useMemo, useState } from "react";
 import { Dialog, Menu, Transition } from "@headlessui/react";
 import {
   BellIcon,
-  HomeIcon,
+  ChartSquareBarIcon,
   MenuAlt2Icon,
   XIcon,
 } from "@heroicons/react/outline";
@@ -52,15 +52,15 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
     console.log(router.asPath);
     const items = [
       {
-        name: "Dashboard",
-        href: "/",
-        icon: HomeIcon,
-        current: true,
-      },
-      {
         name: "Redirects",
         href: "/redirects",
         icon: LinkIcon,
+        current: true,
+      },
+      {
+        name: "Dashboard",
+        href: "/dashboard",
+        icon: ChartSquareBarIcon,
         current: true,
       },
     ];
