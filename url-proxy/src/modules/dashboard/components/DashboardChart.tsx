@@ -14,10 +14,6 @@ export type DashboardChartProps = {
   valueKeys: string[];
 };
 const DashboardChart = ({ data, valueKeys }: DashboardChartProps) => {
-  console.log({
-    data,
-    valueKeys,
-  });
   return (
     <LineChart
       width={500}

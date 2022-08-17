@@ -4,6 +4,7 @@ import { api } from "./base";
 export type GetClickGraphics = {
   owner?: string;
   redirect?: string;
+  redirectGroup?: string;
   destination?: number;
 };
 
