@@ -11,22 +11,15 @@ export type GetManyRedirects = {
   owner?: string;
   limit?: number;
   skip?: number;
+  redirectGroup?: string;
 };
 
 export class RedirectsService {
   path = "/redirects";
 
-  async getMany({
-    owner,
-    limit,
-    skip,
-  }: GetManyRedirects): Promise<ListManyResponse<Redirect>> {
+  async getMany(params: GetManyRedirects): Promise<ListManyResponse<Redirect>> {
     const { data } = await api.get(this.path, {
-      params: {
-        owner,
-        limit,
-        skip,
-      },
+      params,
     });
 
     return data;

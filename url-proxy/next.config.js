@@ -4,6 +4,9 @@ const { withSentryConfig } = require("@sentry/nextjs");
 let config = {
   reactStrictMode: true,
   swcMinify: true,
+  images: {
+    domains: ["images.unsplash.com"],
+  },
 };
 
 const sentryWebpackPluginOptions = {
