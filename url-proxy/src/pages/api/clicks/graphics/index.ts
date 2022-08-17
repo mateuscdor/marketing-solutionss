@@ -143,11 +143,6 @@ const getGraphicData = (clicks: IClickSchema[]) => {
             ...acc2,
             [timeGroupKeyName]: newTimeGroupValue,
           };
-          console.log(`[${subGroupKeyName}][${timeGroupKeyName}]==> 1`, {
-            newTimeGroupValue,
-            acc2,
-            newAcc2,
-          });
           return newAcc2;
         },
         {}
@@ -192,12 +187,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         )
       );
       const graphicData = await getGraphicData(clicks);
-      res
-        .status(200)
-        .json({
-          graphicData: graphicData.preparedGraphicData,
-          destinationNames,
-        });
+      res.status(200).json({
+        graphicData: graphicData.preparedGraphicData,
+        destinationNames,
+      });
       break;
     default:
       res.setHeader("Allow", ["GET"]);
