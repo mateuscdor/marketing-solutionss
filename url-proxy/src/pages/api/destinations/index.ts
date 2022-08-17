@@ -1,10 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { withSentry } from "@sentry/nextjs";
+import mongoose from "mongoose";
 import { Destination } from "../../../entities/Destination";
 import dbConnect from "../../../services/mongoose";
 import {
   DestinationModel,
   IDestinationSchema,
+  RedirectionModel,
 } from "../../../db/mongoose/models";
 import { MongoId } from "../../../db/mongoose/utils";
 
@@ -50,10 +52,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       });
       break;
     case "POST":
+      const _id = new mongoose.Types.ObjectId();
       const { redirect, ...destination } = body;
 
       const data = {
         ...destination,
+        _id,
         redirect: MongoId.stringToObjectId(redirect),
       };
 
@@ -68,6 +72,17 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           },
         }
       ).lean();
+
+      await RedirectionModel.updateOne(
+        {
+          _id: redirect,
+        },
+        {
+          $$push: {
+            destinations: _id,
+          },
+        }
+      );
 
       const order = (lastDestination?.order || 0) + 1;
 

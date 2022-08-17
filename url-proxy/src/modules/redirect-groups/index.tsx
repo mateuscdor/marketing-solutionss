@@ -1,54 +1,51 @@
+import type { NextPage } from "next";
 import { useCallback, useState } from "react";
 import useSWR from "swr";
 import { toast } from "react-toastify";
 import ManageHeader from "../../components/headers/manage";
 import Table from "../../components/table";
-import { Redirect } from "../../entities/Redirect";
-import { RedirectsService } from "../../services/redirects";
-import RedirectionModal from "./components/RedirectModal";
+import { RedirectGroup } from "../../entities/RedirectGroup";
+import { RedirectGroupsService } from "../../services/redirect-groups";
+import RedirectGroupModal from "./components/RedirectGroupsModal";
 import { useRouter } from "next/router";
 import { useAuthStore } from "../../shared/state";
-import { omit, truncate } from "lodash";
+import { omit } from "lodash";
+import truncate from "lodash/truncate";
 import DeleteResourceModal from "../../components/modals/delete-resource";
 import usePersistentState from "../../shared/hooks/usePersistentState";
 import { PaginationFilters } from "../../shared/types";
+import format from "date-fns/format";
 
-const service = new RedirectsService();
+const service = new RedirectGroupsService();
 
 export type PageState = {
-  selectedEntity?: Redirect;
+  selectedEntity?: RedirectGroup;
   modalIsOpen: boolean;
   deleteModalIsOpen: boolean;
 };
-export type RedirectionsHomeProps = {
-  redirectGroupId: string;
-  redirectGroupName: string;
-};
-
-const RedirectsHome = ({
-  redirectGroupId,
-  redirectGroupName,
-}: RedirectionsHomeProps) => {
-  const router = useRouter();
+export type RedirectGroupsHomeProps = {};
+const RedirectGroupsHome: NextPage<RedirectGroupsHomeProps> = ({}) => {
   const authStore = useAuthStore();
+  const router = useRouter();
   const [paginationFilters, setPaginationFilters] =
-    usePersistentState<PaginationFilters>("RedirectsHomePaginationFilters", {
-      defaultValue: {
-        limit: 10,
-        skip: 0,
-      },
-    });
-
+    usePersistentState<PaginationFilters>(
+      "RedirectGroupsHomePaginationFilters",
+      {
+        defaultValue: {
+          limit: 10,
+          skip: 0,
+        },
+      }
+    );
   const {
     data: entitiesResponse,
     mutate,
     isValidating,
   } = useSWR(
-    ["/api/redirects", paginationFilters],
+    [`/api/redirect-groups`, paginationFilters],
     () => {
       return service.getMany({
         owner: authStore.user?.id,
-        redirectGroup: redirectGroupId,
         ...paginationFilters,
       });
     },
@@ -113,17 +110,8 @@ const RedirectsHome = ({
             modalIsOpen: true,
           }));
         }}
-        titleComponent={
-          <div className="flex items-center">
-            <h1 className="text-xl font-semibold text-gray-900 mr-4">{`Redirects of group ${truncate(
-              redirectGroupName,
-              {
-                length: 25,
-              }
-            )}`}</h1>
-          </div>
-        }
-        description={`A list of all the redirects for group ${redirectGroupName}.`}
+        title="Redirect Groups"
+        description="A list of all the redirectGroups in your account."
       />
       <Table
         isLoading={isValidating}
@@ -153,59 +141,53 @@ const RedirectsHome = ({
             key: "name",
             label: "Name",
           },
+
+          {
+            key: "createdAt",
+            label: "Created",
+          },
         ]}
-        data={(entitiesResponse?.results || []).map((entity) => ({
-          ...entity,
-          destinations: (entity.destinations || [])
-            .map(({ url }) => url)
-            .join(", "),
-        }))}
+        data={(entitiesResponse?.results || []).map((redirectGroup) => {
+          return {
+            ...redirectGroup,
+            createdAt: format(
+              new Date(redirectGroup.createdAt as string),
+              "dd/MM/yy"
+            ),
+          };
+        })}
         actions={[
           {
-            label: "Share",
-            onClick: async ({ item, index }) => {
-              console.debug("Sharing entity", index);
-              const sharedLink =
-                item.shortUrl?.shortUrl || service.getShareUrl(item.id);
-
-              toast("Link copied to clipboard", {
-                type: "success",
-              });
-              navigator.clipboard.writeText(sharedLink);
-            },
-          },
-          {
-            label: "Edit",
+            label: "Redirects",
             onClick: ({ item, index }) => {
-              console.debug("Editing entity", index);
-
-              setPageState((oldState) => ({
-                ...oldState,
-                selectedEntity: item,
-                modalIsOpen: true,
-              }));
-            },
-          },
-          {
-            label: "Destinations",
-            onClick: ({ item, index }) => {
-              console.debug("Going to destinations", index);
+              console.debug("Going to redirects", { item });
 
               router.push({
-                pathname: `/destinations`,
+                pathname: `/redirects`,
                 query: {
-                  redirectGroupId: item.redirectGroup,
-                  redirectId: item.id,
-                  redirectSource: item.name,
-                  shortUrl: item.shortUrl?.shortUrl || "",
+                  redirectGroupId: item.id,
+                  redirectGroupName: item.name,
                 },
               });
             },
           },
           {
+            label: "Edit",
+            onClick: ({ item, index }) => {
+              console.debug("Editing entity", item.name);
+
+              setPageState((oldState) => ({
+                ...oldState,
+                modalIsOpen: true,
+                selectedEntity: entitiesResponse?.results[index],
+              }));
+            },
+          },
+          {
             label: "Delete",
-            onClick: async ({ item, index }) => {
-              console.debug("Opening delete entity modal", index);
+            onClick: async ({ item }) => {
+              console.debug("Opening delete entity modal", item.name);
+
               setPageState((oldState) => ({
                 ...oldState,
                 selectedEntity: item,
@@ -215,19 +197,17 @@ const RedirectsHome = ({
           },
         ]}
       />
-      <RedirectionModal
+      <RedirectGroupModal
         isOpen={pageState.modalIsOpen}
         setOpen={setModalIsOpen}
         entity={pageState.selectedEntity as any}
         onCreate={async (data) => {
-          console.debug("Creating", data);
-
           const body = {
             ...data,
             owner: authStore.user?.id as string,
-            redirectGroup: redirectGroupId,
           };
 
+          console.debug("Creating", body);
           await service
             .create(body)
             .then(() => {
@@ -244,7 +224,7 @@ const RedirectsHome = ({
           console.debug("Updating", data);
 
           await service
-            .update(id, omit(data, ["redirects", "owner", "redirectGroup"]))
+            .update(id, omit(data, "owner"))
             .then(() => {
               mutate();
               setModalIsOpen(false);
@@ -258,16 +238,19 @@ const RedirectsHome = ({
       />
       {pageState.selectedEntity && (
         <DeleteResourceModal
-          title={`Delete redirect ${truncate(pageState.selectedEntity?.name, {
-            length: 20,
-          })}`}
-          description={`Are you sure you want to delete the redirect ${pageState.selectedEntity?.name}? This redirection and all its destinations will be permanently removed
+          title={`Delete redirects group ${truncate(
+            pageState.selectedEntity?.name,
+            {
+              length: 20,
+            }
+          )}`}
+          description={`Are you sure you want to delete the redirects group ${pageState.selectedEntity?.name}? This redirects group will be permanently removed
       from our servers forever. This action cannot be undone.`}
           isOpen={pageState.deleteModalIsOpen}
           onDelete={async () => {
             console.debug("Deleting entity", pageState!.selectedEntity!.name);
             await service
-              .delete(pageState.selectedEntity?.id as string)
+              .delete(pageState!.selectedEntity!.id as string)
               .then(() => {
                 mutate();
                 setPageState((oldState) => ({
@@ -292,4 +275,4 @@ const RedirectsHome = ({
   );
 };
 
-export default RedirectsHome;
+export default RedirectGroupsHome;

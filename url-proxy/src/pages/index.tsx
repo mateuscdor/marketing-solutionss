@@ -11,7 +11,7 @@ const Page = (props: any) => (
 export const getServerSideProps: GetServerSideProps = async () => {
   return {
     redirect: {
-      destination: "/redirects",
+      destination: "/redirect-groups",
       permanent: false,
     },
   };

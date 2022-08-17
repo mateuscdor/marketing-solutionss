@@ -1,6 +1,6 @@
 import { GetServerSideProps } from "next";
-import DestinationsPage from "../../../../modules/destinations";
-import DashboardLayout from "../../../../layouts/dashboard";
+import DestinationsPage from "../../modules/destinations";
+import DashboardLayout from "../../layouts/dashboard";
 
 const Page = (props: any) => (
   <DashboardLayout>
@@ -9,16 +9,16 @@ const Page = (props: any) => (
 );
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { id } = context.params || {};
-  const { redirectSource } = context.query || {};
+  const { redirectSource, redirectId, redirectGroupId } = context.query || {};
 
-  if (!id) {
+  if (!redirectId) {
     return {
       notFound: true,
     };
   }
   return {
-    props: { redirectId: id, redirectSource },
+    props: { redirectId, redirectSource, redirectGroupId },
   };
 };
+
 export default Page;

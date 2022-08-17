@@ -48,12 +48,12 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const navigationItems = useMemo(() => {
+  const navigationItems: any[] = useMemo(() => {
     console.log(router.asPath);
     const items = [
       {
-        name: "Redirects",
-        href: "/redirects",
+        name: "Redirect groups",
+        href: "/redirect-groups",
         icon: LinkIcon,
         current: true,
       },
@@ -70,6 +70,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
       current: item.href === router.asPath,
     }));
   }, [router]);
+
   if (!authStore.user) {
     return <FullscreenLoading />;
   }
@@ -253,6 +254,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                         className="h-8 w-8 rounded-full"
                         src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
                         alt=""
+                        layout="fill"
                       />
                     </Menu.Button>
                   </div>
