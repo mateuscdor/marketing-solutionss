@@ -78,7 +78,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           _id: redirect,
         },
         {
-          $$push: {
+          $push: {
             destinations: _id,
           },
         }
