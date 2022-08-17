@@ -25,6 +25,7 @@ export class UniqueClicksPerDestinationStrategy
       redirect: MongoId.fromId(redirect as any),
       redirectGroup: redirect.redirectGroup,
       destination: destination?._id,
+      owner: redirect.owner,
       type: ClickType.unique,
       userIp: ip,
       value: isNew === true ? 1 : 0,

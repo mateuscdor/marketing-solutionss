@@ -7,6 +7,7 @@ export type Click = {
   userIp: string;
   redirect?: any;
   redirectGroup?: any;
+  owner: string;
   destination?: any;
   type: ClickType;
   value: number;
