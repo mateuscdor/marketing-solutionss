@@ -19,7 +19,7 @@ const DashboardHome = () => {
     () => {
       return redirectsService.getMany({
         owner: authStore.user?.id,
-        limit: 30,
+        limit: 10000,
         skip: 0,
       });
     },
