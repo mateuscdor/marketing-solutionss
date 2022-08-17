@@ -5,6 +5,7 @@ export interface IClickSchema {
   _id: mongoose.Types.ObjectId | any;
   userIp: string;
   redirect?: any;
+  redirectGroup?: any;
   destination?: any;
   type: ClickType;
   value: number;
@@ -23,6 +24,10 @@ export const ClickSchema = new mongoose.Schema<IClickSchema>(
     redirect: {
       type: mongoose.Types.ObjectId,
       ref: "Redirection",
+    },
+    redirectGroup: {
+      type: mongoose.Types.ObjectId,
+      ref: "RedirectGroup",
     },
     destination: {
       type: mongoose.Types.ObjectId,
