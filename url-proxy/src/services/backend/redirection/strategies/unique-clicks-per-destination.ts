@@ -23,6 +23,7 @@ export class UniqueClicksPerDestinationStrategy
     console.debug(`==> registering click`);
     await ClickModel.create({
       redirect: MongoId.fromId(redirect as any),
+      redirectGroup: redirect.redirectGroup,
       destination: destination?._id,
       type: ClickType.unique,
       userIp: ip,
