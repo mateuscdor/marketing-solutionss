@@ -1,6 +1,6 @@
 import { ClockIcon } from "@heroicons/react/outline";
-import { isEmpty } from "lodash";
-import React from "react";
+import { isEmpty, omit } from "lodash";
+import React, { useCallback, useMemo } from "react";
 import {
   LineChart,
   Line,
@@ -10,12 +10,41 @@ import {
   Tooltip,
   Legend,
 } from "recharts";
+import { getRandomHEXColor } from "../../../utils";
 
 export type DashboardChartProps = {
   data: any[];
-  valueKeys: string[];
+  valueKeys?: string[];
+  colorsEnum?: {
+    [key: string]: string;
+  };
 };
-const DashboardChart = ({ data, valueKeys }: DashboardChartProps) => {
+const DashboardChart = ({
+  data = [],
+  valueKeys: selectedValueKeys,
+  colorsEnum,
+}: DashboardChartProps) => {
+  const valueKeys = useMemo(() => {
+    if (selectedValueKeys) return selectedValueKeys;
+
+    const differentKeys = Array.from(
+      new Set(data.flatMap((e) => Object.keys(omit(e, "name"))))
+    );
+
+    return differentKeys;
+  }, [data, selectedValueKeys]);
+
+  const getColor = useCallback(
+    (key: string) => {
+      if (colorsEnum && colorsEnum[key]) {
+        return colorsEnum[key];
+      }
+
+      return getRandomHEXColor();
+    },
+    [colorsEnum]
+  );
+
   if (isEmpty(data)) {
     return (
       <div className="flex flex-col w-full h-full text-center justify-center items-center border-dashed border-2 rounded-md py-4 px-6">
@@ -25,6 +54,7 @@ const DashboardChart = ({ data, valueKeys }: DashboardChartProps) => {
       </div>
     );
   }
+
   return (
     <LineChart
       width={500}
@@ -48,7 +78,7 @@ const DashboardChart = ({ data, valueKeys }: DashboardChartProps) => {
           key={key}
           type="monotone"
           dataKey={key}
-          stroke="#8884d8"
+          stroke={getColor(key)}
           activeDot={{ r: 8 }}
         />
       ))}

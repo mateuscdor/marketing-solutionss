@@ -1,17 +1,17 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 import useSWR from "swr";
 import SimpleHeader from "../../components/headers/simple";
 import ComboBox from "../../components/inputs/combo-box";
 import { Redirect } from "../../entities/Redirect";
 import { RedirectGroup } from "../../entities/RedirectGroup";
+import { CHART_COLOR_BY_TYPE } from "../../enum";
 import { ClicksService, GetClickGraphics } from "../../services/clicks";
 import { RedirectGroupsService } from "../../services/redirect-groups";
-import { RedirectsService } from "../../services/redirects";
 import { useAuthStore } from "../../shared/state";
+import { getRandomHEXColor } from "../../utils";
 import DashboardChart from "./components/DashboardChart";
 
-const redirectsService = new RedirectsService();
 const redirectGroupsService = new RedirectGroupsService();
 
 const clicksService = new ClicksService();
@@ -58,17 +58,10 @@ const DashboardHome = () => {
           type: "error",
         });
       },
+      refreshInterval: 60_000 * 5,
     }
   );
 
-  const parseRedirectToComboBoxItem = useCallback(
-    (r: Redirect) => ({
-      ...r,
-      label: r.name,
-      id: r.id as string,
-    }),
-    []
-  );
   const parseRedirectGroupToComboBoxItem = useCallback(
     (r: RedirectGroup) => ({
       ...r,
@@ -77,6 +70,32 @@ const DashboardHome = () => {
     }),
     []
   );
+
+  const graphicDestinationColors = useMemo(() => {
+    if (!response?.graphicData?.by_destination_name?.day) return {};
+
+    return Object.keys(response?.graphicData.by_destination_name.day[0]).reduce(
+      (acc, key) => {
+        const cacheKey = `@traffic_graphic_color_${key}`;
+        const cachedColor = sessionStorage.getItem(cacheKey);
+        if (cachedColor) {
+          return {
+            ...acc,
+            [key]: cachedColor,
+          };
+        }
+        const randomColor = getRandomHEXColor();
+
+        sessionStorage.setItem(cacheKey, randomColor);
+
+        return {
+          ...acc,
+          [key]: randomColor,
+        };
+      },
+      {}
+    );
+  }, [response?.graphicData?.by_destination_name?.day]);
 
   const selectedRedirectGroupOption = useMemo(() => {
     if (
@@ -136,16 +155,16 @@ const DashboardHome = () => {
             <div className="flex flex-col justify-center items-center">
               <span className="font-light">Daily</span>
               <DashboardChart
-                valueKeys={response.destinationNames}
-                data={response?.graphicData?.by_click_type?.day}
+                colorsEnum={graphicDestinationColors}
+                data={response?.graphicData?.by_destination_name?.day}
               />
             </div>
 
             <div className="flex flex-col justify-center items-center">
               <span className="font-light">Hourly</span>
               <DashboardChart
-                valueKeys={response.destinationNames}
-                data={response?.graphicData?.by_click_type?.day_hour}
+                colorsEnum={graphicDestinationColors}
+                data={response?.graphicData?.by_destination_name?.day_hour}
               />
             </div>
           </div>
@@ -160,7 +179,7 @@ const DashboardHome = () => {
             <div className="flex flex-col justify-center items-center">
               <span className="font-light">Daily</span>
               <DashboardChart
-                valueKeys={response.destinationNames}
+                colorsEnum={CHART_COLOR_BY_TYPE}
                 data={response?.graphicData?.by_click_type?.day}
               />
             </div>
@@ -168,7 +187,7 @@ const DashboardHome = () => {
             <div className="flex flex-col justify-center items-center">
               <span className="font-light">Hourly</span>
               <DashboardChart
-                valueKeys={response.destinationNames}
+                colorsEnum={CHART_COLOR_BY_TYPE}
                 data={response?.graphicData?.by_click_type?.day_hour}
               />
             </div>

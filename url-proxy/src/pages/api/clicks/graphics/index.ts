@@ -5,7 +5,7 @@ import parse from "date-fns/parse";
 
 import dbConnect from "../../../../services/mongoose";
 import { ClickModel, IClickSchema } from "../../../../db/mongoose/models";
-import { identity, pick, pickBy } from "lodash";
+import { identity, merge, pick, pickBy } from "lodash";
 import { MongoId } from "../../../../db/mongoose/utils";
 
 export type GraphicDataGroupTimeValue = {
@@ -59,6 +59,10 @@ const getGraphicData = (clicks: IClickSchema[]) => {
       subGroupValueExtractor: (click: IClickSchema) => click?.type,
     },
   ];
+
+  const valueKeysObj: {
+    [key: string]: Set<string>;
+  } = {};
   const graphicData = clicks.reduce((acc, click) => {
     const newAcc: any = {
       ...acc,
@@ -72,6 +76,12 @@ const getGraphicData = (clicks: IClickSchema[]) => {
 
       subGroupKeys.forEach(({ subGroupKeyName, subGroupValueExtractor }) => {
         const subGroupValue = subGroupValueExtractor(click);
+
+        if (!valueKeysObj[subGroupKeyName]) {
+          valueKeysObj[subGroupKeyName] = new Set();
+        }
+
+        valueKeysObj[subGroupKeyName].add(subGroupValue);
 
         if (newAcc[subGroupKeyName]?.[timeGroupKeyName]?.[formattedTime]) {
           if (
@@ -119,6 +129,25 @@ const getGraphicData = (clicks: IClickSchema[]) => {
     return newAcc;
   }, {}) as GraphicData;
 
+  const defaultDataValueObj: any = Object.entries(valueKeysObj).reduce(
+    (acc, [key, valueKeysSet]) => {
+      const defaultDataObj = Array.from(valueKeysSet).reduce(
+        (acc2: any, valueKeyKey) => {
+          return {
+            ...acc2,
+            [valueKeyKey as string]: 0,
+          };
+        },
+        {}
+      );
+      return {
+        ...acc,
+        [key]: defaultDataObj,
+      };
+    },
+    {}
+  );
+
   const preparedGraphicData = Object.entries(graphicData).reduce(
     (acc, [subGroupKeyName, subGroupKeyValue]) => {
       const newSubGroupVaue = Object.entries(subGroupKeyValue).reduce(
@@ -133,6 +162,7 @@ const getGraphicData = (clicks: IClickSchema[]) => {
             })
             .map(([keyName, keyValue]) => {
               const newValue = {
+                ...defaultDataValueObj[subGroupKeyName],
                 name: keyName,
                 ...keyValue,
               };
@@ -158,6 +188,7 @@ const getGraphicData = (clicks: IClickSchema[]) => {
     },
     {}
   );
+
   return {
     graphicData,
     preparedGraphicData,

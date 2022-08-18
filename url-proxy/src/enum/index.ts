@@ -8,3 +8,8 @@ export const REDIRECT_STRATEGIES = {
     label: "Unique clicks per destination",
   },
 };
+
+export const CHART_COLOR_BY_TYPE = {
+  simple: "#00876a",
+  unique: "#000587",
+};
