@@ -95,7 +95,7 @@ const DashboardHome = () => {
       },
       {}
     );
-  }, [response?.graphicData.by_destination_name.day]);
+  }, [response?.graphicData?.by_destination_name?.day]);
 
   const selectedRedirectGroupOption = useMemo(() => {
     if (
