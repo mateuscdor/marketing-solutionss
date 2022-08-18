@@ -170,7 +170,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   switch (method) {
     case "GET":
       let filters = pickBy(
-        pick(query, ["redirect", "destination", "redirectGroup"]),
+        pick(query, ["owner", "redirect", "destination", "redirectGroup"]),
         identity
       );
 
@@ -179,7 +179,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       filters = Object.entries(filters).reduce((acc, [key, value]) => {
         return {
           ...acc,
-          [key]: MongoId.stringToObjectId(value as string),
+          [key]: MongoId.canBeObjectId(value)
+            ? MongoId.stringToObjectId(value as string)
+            : value,
         };
       }, {});
 

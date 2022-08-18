@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 import useSWR from "swr";
+import SimpleHeader from "../../components/headers/simple";
+import ComboBox from "../../components/inputs/combo-box";
 import { Redirect } from "../../entities/Redirect";
 import { RedirectGroup } from "../../entities/RedirectGroup";
 import { ClicksService, GetClickGraphics } from "../../services/clicks";
@@ -8,7 +10,6 @@ import { RedirectGroupsService } from "../../services/redirect-groups";
 import { RedirectsService } from "../../services/redirects";
 import { useAuthStore } from "../../shared/state";
 import DashboardChart from "./components/DashboardChart";
-import DashboardHeader from "./components/DashboardHeader";
 
 const redirectsService = new RedirectsService();
 const redirectGroupsService = new RedirectGroupsService();
@@ -38,7 +39,9 @@ const DashboardHome = () => {
   const authStore = useAuthStore();
 
   const [getClickGraphicsFilters, setGetClickGraphicsFilters] =
-    useState<GetClickGraphics>({});
+    useState<GetClickGraphics>({
+      owner: authStore.user?.id,
+    });
   const {
     data: response,
     mutate,
@@ -86,10 +89,7 @@ const DashboardHome = () => {
         ) as RedirectGroup
       );
     }
-    return (
-      redirectGroupsResponse?.results?.[0] &&
-      parseRedirectGroupToComboBoxItem(redirectGroupsResponse?.results?.[0])
-    );
+    return undefined;
   }, [
     getClickGraphicsFilters.redirectGroup,
     parseRedirectGroupToComboBoxItem,
@@ -98,57 +98,81 @@ const DashboardHome = () => {
 
   return (
     <div className="flex flex-col w-full h-full">
-      <DashboardHeader
-        comboBoxProps={{
-          items: (redirectGroupsResponse?.results || []).map(
-            parseRedirectGroupToComboBoxItem
-          ),
-          query: "",
-          setQuery: (newQuery) => {
-            console.log({ newQuery });
-          },
-          selected: selectedRedirectGroupOption,
-          setSelected: (selected) => {
-            console.log({ selected });
-            setGetClickGraphicsFilters((oldState) => ({
-              ...oldState,
-              redirectGroup: selected?.id as string,
-            }));
-          },
-        }}
-      />
-
+      <SimpleHeader title="Dashboard" />
+      <div className="flex flex-col w-full h-full items-start pl-4">
+        <h3 className="text-md font-light text-gray-900">Filters</h3>
+        <div className="flex flex-row w-full h-full">
+          <div className="flex flex-col justify-center pl-16">
+            <h3 className="text-left text-md font-thin text-black pr-8">
+              Redirect group
+            </h3>
+            <ComboBox
+              items={(redirectGroupsResponse?.results || []).map(
+                parseRedirectGroupToComboBoxItem
+              )}
+              query={""}
+              setQuery={(newQuery) => {
+                console.log({ newQuery });
+              }}
+              selected={selectedRedirectGroupOption}
+              setSelected={(selected) => {
+                console.log({ selected });
+                setGetClickGraphicsFilters((oldState) => ({
+                  ...oldState,
+                  redirectGroup: selected?.id as string,
+                }));
+              }}
+            />
+          </div>
+        </div>
+      </div>
+      <div className="mt-8 w-full border-b border-gray-300"></div>
       {!!response && (
-        <div className="mt-2 grid grid-cols-1 gap-2 lg:grid-cols-2 ">
-          {!!response.graphicData.by_destination_name.day && (
+        <div>
+          <h3 className="text-sm font-semibold text-gray-900 p-4">
+            By destination
+          </h3>
+          <div className="grid grid-cols-1 gap-2 lg:grid-cols-2 ">
             <div className="flex flex-col justify-center items-center">
-              <span className="font-light">Clicks by day</span>
+              <span className="font-light">Daily</span>
               <DashboardChart
                 valueKeys={response.destinationNames}
-                data={response.graphicData.by_destination_name.day}
+                data={response?.graphicData?.by_click_type?.day}
               />
             </div>
-          )}
 
-          {!!response.graphicData.by_destination_name.day_hour && (
             <div className="flex flex-col justify-center items-center">
-              <span className="font-light">Clicks by hour</span>
+              <span className="font-light">Hourly</span>
               <DashboardChart
                 valueKeys={response.destinationNames}
-                data={response.graphicData.by_destination_name.day_hour}
+                data={response?.graphicData?.by_click_type?.day_hour}
               />
             </div>
-          )}
+          </div>
+        </div>
+      )}
+      {!!response && (
+        <div>
+          <h3 className="text-sm font-semibold text-gray-900 p-4">
+            By click type
+          </h3>
+          <div className="grid grid-cols-1 gap-2 lg:grid-cols-2 ">
+            <div className="flex flex-col justify-center items-center">
+              <span className="font-light">Daily</span>
+              <DashboardChart
+                valueKeys={response.destinationNames}
+                data={response?.graphicData?.by_click_type?.day}
+              />
+            </div>
 
-          {!!response.graphicData.by_destination_name.day_hour_minute && (
             <div className="flex flex-col justify-center items-center">
-              <span className="font-light">Clicks by time</span>
+              <span className="font-light">Hourly</span>
               <DashboardChart
                 valueKeys={response.destinationNames}
-                data={response.graphicData.by_destination_name.day_hour_minute}
+                data={response?.graphicData?.by_click_type?.day_hour}
               />
             </div>
-          )}
+          </div>
         </div>
       )}
     </div>
