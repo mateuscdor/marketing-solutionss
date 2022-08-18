@@ -76,9 +76,21 @@ const DashboardHome = () => {
 
     return Object.keys(response?.graphicData.by_destination_name.day[0]).reduce(
       (acc, key) => {
+        const cacheKey = `@traffic_graphic_color_${key}`;
+        const cachedColor = sessionStorage.getItem(cacheKey);
+        if (cachedColor) {
+          return {
+            ...acc,
+            [key]: cachedColor,
+          };
+        }
+        const randomColor = getRandomHEXColor();
+
+        sessionStorage.setItem(cacheKey, randomColor);
+
         return {
           ...acc,
-          [key]: getRandomHEXColor(),
+          [key]: randomColor,
         };
       },
       {}
