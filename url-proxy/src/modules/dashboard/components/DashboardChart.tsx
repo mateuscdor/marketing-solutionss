@@ -10,6 +10,7 @@ import {
   Tooltip,
   Legend,
 } from "recharts";
+import { getRandomHEXColor } from "../../../utils";
 
 export type DashboardChartProps = {
   data: any[];
@@ -39,7 +40,7 @@ const DashboardChart = ({
         return colorsEnum[key];
       }
 
-      return `#${Math.floor(Math.random() * 16777215).toString(16)}`;
+      return getRandomHEXColor();
     },
     [colorsEnum]
   );
