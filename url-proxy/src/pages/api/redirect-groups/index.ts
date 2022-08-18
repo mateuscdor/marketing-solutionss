@@ -20,6 +20,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       const redirectGroups = await RedirectGroupModel.find(filters, null, {
         limit,
         skip,
+        sort: {
+          createdAt: -1,
+        },
       }).lean();
 
       const total = await RedirectGroupModel.countDocuments(filters);
