@@ -5,7 +5,8 @@ import parse from "date-fns/parse";
 
 import dbConnect from "../../../../services/mongoose";
 import { ClickModel, IClickSchema } from "../../../../db/mongoose/models";
-import { identity, pickBy } from "lodash";
+import { identity, pick, pickBy } from "lodash";
+import { MongoId } from "../../../../db/mongoose/utils";
 
 export type GraphicDataGroupTimeValue = {
   [moment: string]: {
@@ -168,19 +169,27 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   switch (method) {
     case "GET":
-      const filters = pickBy(
-        {
-          owner: query.owner,
-          redirect: query.redirect,
-          destination: query.destination,
-        },
+      let filters = pickBy(
+        pick(query, ["owner", "redirect", "destination", "redirectGroup"]),
         identity
       );
 
+      console.debug("Graphic filters 1", filters);
+
+      filters = Object.entries(filters).reduce((acc, [key, value]) => {
+        return {
+          ...acc,
+          [key]: MongoId.canBeObjectId(value)
+            ? MongoId.stringToObjectId(value as string)
+            : value,
+        };
+      }, {});
+
+      console.debug("Graphic filters", filters);
       const clicks = await ClickModel.find(filters)
         .populate("destination")
         .lean();
-
+      console.debug("Graphic clicks", clicks);
       const destinationNames = Array.from(
         new Set(
           clicks.map(({ destination }) => destination?.name).filter(identity)

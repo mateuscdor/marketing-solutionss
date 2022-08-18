@@ -31,4 +31,12 @@ export class MongoId {
   static objectIdToString(_id: mongoose.Types.ObjectId): string {
     return _id.toString();
   }
+  static canBeObjectId(id: any): boolean {
+    try {
+      new mongoose.Types.ObjectId(id.toString());
+      return true;
+    } catch {
+      return false;
+    }
+  }
 }

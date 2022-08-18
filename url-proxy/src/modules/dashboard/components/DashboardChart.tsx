@@ -1,3 +1,5 @@
+import { ClockIcon } from "@heroicons/react/outline";
+import { isEmpty } from "lodash";
 import React from "react";
 import {
   LineChart,
@@ -14,10 +16,15 @@ export type DashboardChartProps = {
   valueKeys: string[];
 };
 const DashboardChart = ({ data, valueKeys }: DashboardChartProps) => {
-  console.log({
-    data,
-    valueKeys,
-  });
+  if (isEmpty(data)) {
+    return (
+      <div className="flex flex-col w-full h-full text-center justify-center items-center border-dashed border-2 rounded-md py-4 px-6">
+        <ClockIcon className="w-10 h-10 text-gray-500" />
+        <h3 className="mt-2 text-sm font-medium text-gray-900">No data</h3>
+        <p className="mt-1 text-sm text-gray-500">No data to show yet...</p>
+      </div>
+    );
+  }
   return (
     <LineChart
       width={500}
