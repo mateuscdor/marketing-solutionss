@@ -6,6 +6,7 @@ import {
 } from "../../../../db/mongoose/models";
 import { MongoId } from "../../../../db/mongoose/utils";
 import { deleteRedirect } from "../../redirects/[id]";
+import dbConnect from "../../../../services/mongoose";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const {
@@ -13,6 +14,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     body,
     method,
   } = req;
+
+  await dbConnect();
 
   switch (method) {
     case "GET":
