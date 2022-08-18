@@ -7,6 +7,7 @@ import {
 } from "../../../../db/mongoose/models";
 import { MongoId } from "../../../../db/mongoose/utils";
 import { ShortUrlService } from "../../../../services/backend/shorturl";
+import dbConnect from "../../../../services/mongoose";
 
 const shortUrlService = new ShortUrlService();
 
@@ -45,6 +46,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     method,
   } = req;
 
+  await dbConnect();
+  
   switch (method) {
     case "GET":
       const redirect = await RedirectionModel.findById(id).lean();
