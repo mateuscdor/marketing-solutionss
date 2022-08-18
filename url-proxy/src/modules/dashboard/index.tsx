@@ -1,17 +1,16 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 import useSWR from "swr";
 import SimpleHeader from "../../components/headers/simple";
 import ComboBox from "../../components/inputs/combo-box";
 import { Redirect } from "../../entities/Redirect";
 import { RedirectGroup } from "../../entities/RedirectGroup";
+import { CHART_COLOR_BY_TYPE } from "../../enum";
 import { ClicksService, GetClickGraphics } from "../../services/clicks";
 import { RedirectGroupsService } from "../../services/redirect-groups";
-import { RedirectsService } from "../../services/redirects";
 import { useAuthStore } from "../../shared/state";
 import DashboardChart from "./components/DashboardChart";
 
-const redirectsService = new RedirectsService();
 const redirectGroupsService = new RedirectGroupsService();
 
 const clicksService = new ClicksService();
@@ -136,16 +135,14 @@ const DashboardHome = () => {
             <div className="flex flex-col justify-center items-center">
               <span className="font-light">Daily</span>
               <DashboardChart
-                valueKeys={response.destinationNames}
-                data={response?.graphicData?.by_click_type?.day}
+                data={response?.graphicData?.by_destination_name?.day}
               />
             </div>
 
             <div className="flex flex-col justify-center items-center">
               <span className="font-light">Hourly</span>
               <DashboardChart
-                valueKeys={response.destinationNames}
-                data={response?.graphicData?.by_click_type?.day_hour}
+                data={response?.graphicData?.by_destination_name?.day_hour}
               />
             </div>
           </div>
@@ -160,7 +157,7 @@ const DashboardHome = () => {
             <div className="flex flex-col justify-center items-center">
               <span className="font-light">Daily</span>
               <DashboardChart
-                valueKeys={response.destinationNames}
+                colorsEnum={CHART_COLOR_BY_TYPE}
                 data={response?.graphicData?.by_click_type?.day}
               />
             </div>
@@ -168,7 +165,7 @@ const DashboardHome = () => {
             <div className="flex flex-col justify-center items-center">
               <span className="font-light">Hourly</span>
               <DashboardChart
-                valueKeys={response.destinationNames}
+                colorsEnum={CHART_COLOR_BY_TYPE}
                 data={response?.graphicData?.by_click_type?.day_hour}
               />
             </div>
