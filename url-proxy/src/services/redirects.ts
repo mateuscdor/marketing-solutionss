@@ -1,6 +1,7 @@
 import axiosRetry from "axios-retry";
 import { Destination } from "../entities/Destination";
 import { Redirect } from "../entities/Redirect";
+import { ListManyResponse } from "../shared/types";
 import { GetDestinationMetadata } from "./backend/redirection";
 import { api } from "./base";
 
@@ -8,18 +9,17 @@ axiosRetry(api, { retries: 3 });
 
 export type GetManyRedirects = {
   owner?: string;
+  limit?: number;
+  skip?: number;
+  redirectGroup?: string;
 };
 
 export class RedirectsService {
   path = "/redirects";
 
-  async getMany({ owner }: GetManyRedirects): Promise<{
-    results: Redirect[];
-  }> {
+  async getMany(params: GetManyRedirects): Promise<ListManyResponse<Redirect>> {
     const { data } = await api.get(this.path, {
-      params: {
-        owner,
-      },
+      params,
     });
 
     return data;

@@ -19,6 +19,8 @@ export class ClicksPerDestinationStrategy implements IDestinationStrategy {
     console.debug(`==> registering click`);
     await ClickModel.create({
       redirect: MongoId.fromId(redirect as any),
+      redirectGroup: redirect.redirectGroup,
+      owner: redirect.owner,
       destination: destination?._id,
       type: ClickType.simple,
       value: 1,

@@ -4,7 +4,9 @@ import { ClickType } from "../../../entities/Click";
 export interface IClickSchema {
   _id: mongoose.Types.ObjectId | any;
   userIp: string;
+  owner: string;
   redirect?: any;
+  redirectGroup?: any;
   destination?: any;
   type: ClickType;
   value: number;
@@ -24,6 +26,11 @@ export const ClickSchema = new mongoose.Schema<IClickSchema>(
       type: mongoose.Types.ObjectId,
       ref: "Redirection",
     },
+    redirectGroup: {
+      type: mongoose.Types.ObjectId,
+      ref: "RedirectGroup",
+    },
+    owner: String,
     destination: {
       type: mongoose.Types.ObjectId,
       ref: "Destination",

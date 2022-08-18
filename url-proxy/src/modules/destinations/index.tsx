@@ -15,6 +15,8 @@ import DeleteResourceModal from "../../components/modals/delete-resource";
 import ConfirmModal from "../../components/modals/confirm";
 import { ShareIcon } from "@heroicons/react/outline";
 import { RedirectsService } from "../../services/redirects";
+import usePersistentState from "../../shared/hooks/usePersistentState";
+import { PaginationFilters } from "../../shared/types";
 
 const service = new DestinationsService();
 const redirectsService = new RedirectsService();
@@ -35,16 +37,24 @@ const DestinationsHome: NextPage<DestinationsHomeProps> = ({
 }) => {
   const authStore = useAuthStore();
   const router = useRouter();
+  const [paginationFilters, setPaginationFilters] =
+    usePersistentState<PaginationFilters>("DestinationsHomePaginationFilters", {
+      defaultValue: {
+        limit: 10,
+        skip: 0,
+      },
+    });
   const {
     data: entitiesResponse,
     mutate,
     isValidating,
   } = useSWR(
-    `/api/destinations/${redirectId}/destinations`,
+    [`/api/destinations/${redirectId}/destinations`, paginationFilters],
     () => {
       return service.getMany({
         redirectId,
         owner: authStore.user?.id,
+        ...paginationFilters,
       });
     },
     {
@@ -127,7 +137,9 @@ const DestinationsHome: NextPage<DestinationsHomeProps> = ({
               className="h-6 w-6 cursor-pointer"
               onClick={() => {
                 console.debug("Sharing redirect", redirectId);
-                const sharedLink = redirectsService.getShareUrl(redirectId);
+                const sharedLink =
+                  (router.query?.shortUrl as any) ||
+                  redirectsService.getShareUrl(redirectId);
 
                 toast("Link copied to clipboard", {
                   type: "success",
@@ -141,6 +153,27 @@ const DestinationsHome: NextPage<DestinationsHomeProps> = ({
       />
       <Table
         isLoading={isValidating}
+        paginationsProps={
+          paginationFilters && {
+            ...paginationFilters,
+            total: entitiesResponse?.pagination?.total || 0,
+            onNextClick: ({ newSkip }) => {
+              console.debug({ newSkip });
+              setPaginationFilters((oldState) => ({
+                ...oldState,
+                skip: newSkip,
+              }));
+            },
+            onPreviousClick: ({ newSkip }) => {
+              console.debug({ newSkip });
+              setPaginationFilters((oldState) => ({
+                ...oldState,
+                skip: newSkip,
+              }));
+            },
+            ...paginationFilters,
+          }
+        }
         columns={[
           {
             key: "name",

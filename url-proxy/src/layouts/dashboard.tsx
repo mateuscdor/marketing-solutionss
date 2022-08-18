@@ -1,15 +1,16 @@
+/* eslint-disable @next/next/no-img-element */
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Auth } from "aws-amplify";
-import { Fragment, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 import { Dialog, Menu, Transition } from "@headlessui/react";
 import {
   BellIcon,
-  HomeIcon,
+  ChartSquareBarIcon,
   MenuAlt2Icon,
   XIcon,
 } from "@heroicons/react/outline";
-import { SearchIcon } from "@heroicons/react/solid";
+import { LinkIcon } from "@heroicons/react/solid";
 import {
   useTheme,
   View,
@@ -22,15 +23,8 @@ import {
 import Image from "next/image";
 import { useAuthStore } from "../shared/state";
 import FullscreenLoading from "../components/loading/fullscreen";
+import { useRouter } from "next/router";
 
-const navigation = [
-  {
-    name: "Redirects",
-    href: "/redirects",
-    icon: HomeIcon,
-    current: true,
-  },
-];
 const userNavigation = [
   // { name: "Your Profile", href: "#", onClick: () => {} },
   // { name: "Settings", href: "#", onClick: () => {} },
@@ -52,7 +46,31 @@ export type DashboardLayoutProps = {
 };
 const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   const authStore = useAuthStore();
+  const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const navigationItems: any[] = useMemo(() => {
+    console.log(router.asPath);
+    const items = [
+      {
+        name: "Redirect groups",
+        href: "/redirect-groups",
+        icon: LinkIcon,
+        current: true,
+      },
+      {
+        name: "Dashboard",
+        href: "/dashboard",
+        icon: ChartSquareBarIcon,
+        current: true,
+      },
+    ];
+
+    return items.map((item) => ({
+      ...item,
+      current: item.href === router.asPath,
+    }));
+  }, [router]);
 
   if (!authStore.user) {
     return <FullscreenLoading />;
@@ -124,7 +142,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                   </div>
                   <div className="mt-5 flex-1 h-0 overflow-y-auto">
                     <nav className="px-2 space-y-1">
-                      {navigation.map((item) => (
+                      {navigationItems.map((item) => (
                         <a
                           key={item.name}
                           href={item.href}
@@ -167,7 +185,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
             </div>
             <div className="mt-5 flex-1 flex flex-col">
               <nav className="flex-1 px-2 pb-4 space-y-1">
-                {navigation.map((item) => (
+                {navigationItems.map((item) => (
                   <a
                     key={item.name}
                     href={item.href}
@@ -190,7 +208,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
           </div>
         </div>
         <div className="md:pl-64 flex flex-col flex-1">
-          <div className="sticky top-0 z-10 flex-shrink-0 flex h-16 bg-white shadow">
+          <div className="sticky top-0 z-30 flex-shrink-0 flex h-16 bg-white shadow">
             <button
               type="button"
               className="px-4 border-r border-gray-200 text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500 md:hidden"

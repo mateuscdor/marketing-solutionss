@@ -10,6 +10,8 @@ import { useRouter } from "next/router";
 import { useAuthStore } from "../../shared/state";
 import { omit, truncate } from "lodash";
 import DeleteResourceModal from "../../components/modals/delete-resource";
+import usePersistentState from "../../shared/hooks/usePersistentState";
+import { PaginationFilters } from "../../shared/types";
 
 const service = new RedirectsService();
 
@@ -18,19 +20,36 @@ export type PageState = {
   modalIsOpen: boolean;
   deleteModalIsOpen: boolean;
 };
-const RedirectsHome = () => {
+export type RedirectionsHomeProps = {
+  redirectGroupId: string;
+  redirectGroupName: string;
+};
+
+const RedirectsHome = ({
+  redirectGroupId,
+  redirectGroupName,
+}: RedirectionsHomeProps) => {
   const router = useRouter();
   const authStore = useAuthStore();
+  const [paginationFilters, setPaginationFilters] =
+    usePersistentState<PaginationFilters>("RedirectsHomePaginationFilters", {
+      defaultValue: {
+        limit: 10,
+        skip: 0,
+      },
+    });
 
   const {
     data: entitiesResponse,
     mutate,
     isValidating,
   } = useSWR(
-    ["/api/redirects"],
+    ["/api/redirects", paginationFilters],
     () => {
       return service.getMany({
         owner: authStore.user?.id,
+        redirectGroup: redirectGroupId,
+        ...paginationFilters,
       });
     },
     {
@@ -64,6 +83,27 @@ const RedirectsHome = () => {
 
   return (
     <div className="flex flex-col w-full h-full">
+      <div className="flex w-full justify-start">
+        <div className="p-2">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-6 w-6 cursor-pointer"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+            onClick={() => {
+              router.back();
+            }}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M7 16l-4-4m0 0l4-4m-4 4h18"
+            />
+          </svg>
+        </div>
+      </div>
       <ManageHeader
         onCreateClick={() => {
           console.debug("Creating entity");
@@ -73,11 +113,41 @@ const RedirectsHome = () => {
             modalIsOpen: true,
           }));
         }}
-        title="Redirects"
-        description="A list of all the redirects in your account."
+        titleComponent={
+          <div className="flex items-center">
+            <h1 className="text-xl font-semibold text-gray-900 mr-4">{`Redirects of group ${truncate(
+              redirectGroupName,
+              {
+                length: 25,
+              }
+            )}`}</h1>
+          </div>
+        }
+        description={`A list of all the redirects for group ${redirectGroupName}.`}
       />
       <Table
         isLoading={isValidating}
+        paginationsProps={
+          paginationFilters && {
+            ...paginationFilters,
+            total: entitiesResponse?.pagination?.total || 0,
+            onNextClick: ({ newSkip }) => {
+              console.debug({ newSkip });
+              setPaginationFilters((oldState) => ({
+                ...oldState,
+                skip: newSkip,
+              }));
+            },
+            onPreviousClick: ({ newSkip }) => {
+              console.debug({ newSkip });
+              setPaginationFilters((oldState) => ({
+                ...oldState,
+                skip: newSkip,
+              }));
+            },
+            ...paginationFilters,
+          }
+        }
         columns={[
           {
             key: "name",
@@ -95,7 +165,8 @@ const RedirectsHome = () => {
             label: "Share",
             onClick: async ({ item, index }) => {
               console.debug("Sharing entity", index);
-              const sharedLink = service.getShareUrl(item.id);
+              const sharedLink =
+                item.shortUrl?.shortUrl || service.getShareUrl(item.id);
 
               toast("Link copied to clipboard", {
                 type: "success",
@@ -121,9 +192,12 @@ const RedirectsHome = () => {
               console.debug("Going to destinations", index);
 
               router.push({
-                pathname: `/redirects/${item.id}/destinations`,
+                pathname: `/destinations`,
                 query: {
+                  redirectGroupId: item.redirectGroup,
+                  redirectId: item.id,
                   redirectSource: item.name,
+                  shortUrl: item.shortUrl?.shortUrl || "",
                 },
               });
             },
@@ -151,7 +225,7 @@ const RedirectsHome = () => {
           const body = {
             ...data,
             owner: authStore.user?.id as string,
-            user: authStore.user,
+            redirectGroup: redirectGroupId,
           };
 
           await service
@@ -170,7 +244,7 @@ const RedirectsHome = () => {
           console.debug("Updating", data);
 
           await service
-            .update(id, omit(data, ["destinations", "owner"]))
+            .update(id, omit(data, ["redirects", "owner", "redirectGroup"]))
             .then(() => {
               mutate();
               setModalIsOpen(false);
